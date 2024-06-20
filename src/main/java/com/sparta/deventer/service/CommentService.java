@@ -61,4 +61,13 @@ public class CommentService {
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
     }
+
+    public void deleteComment(User user, Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
+        if (comment.getUser().getId() != user.getId()) {
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+        }
+        commentRepository.delete(comment);
+    }
 }

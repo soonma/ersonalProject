@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,10 +53,19 @@ public class CommentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDto requestDto,
             @PathVariable Long id
-    ){
-        return ResponseEntity.ok().body(commentService.updateComment(userDetails.getUser(),requestDto,id));
+    ) {
+        return ResponseEntity.ok()
+                .body(commentService.updateComment(userDetails.getUser(), requestDto, id));
     }
 
+    @DeleteMapping("/{id}")
+    public String deleteComment(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long id
+    ) {
+        commentService.deleteComment(userDetails.getUser(),id);
+        return "삭제가 완료 되었습니다.";
+    }
 
 
 }

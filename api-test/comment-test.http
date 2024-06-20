@@ -45,7 +45,7 @@ Content-Type: application/json
 
 
 ### 댓글 삭제
-DELETE http://localhost:8080/comments/97
+DELETE http://localhost:8080/comments/1
 Authorization:{{Authorization}}
 Content-Type: application/json
 
