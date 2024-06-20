@@ -15,29 +15,29 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
 public class User extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column
+    @Column(unique = true)
     private String token;
 
     @Column(nullable = false)
