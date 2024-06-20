@@ -41,3 +41,12 @@ X-Refresh-Token:{{X-Refresh-Token}}
   client.global.set("Authorization", response.headers.valueOf("Authorization"));
   client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
 %}
+
+### 유저 로그아웃
+POST http://localhost:8080/auth/logout
+Authorization:{{Authorization}}
+
+
+### 유저 탈퇴
+DELETE http://localhost:8080/auth/withdraw
+Authorization:{{Authorization}}

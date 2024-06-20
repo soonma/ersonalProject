@@ -38,4 +38,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleIllegalArgumentException(InvalidException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+
+    @ExceptionHandler(AlreadyWithdrawnException.class)
+    public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }

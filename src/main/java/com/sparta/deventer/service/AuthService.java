@@ -51,6 +51,8 @@ public class AuthService {
 
         User user = getUserByUsername(requestDto.getUsername());
 
+        user.checkUserWithdrawn();
+
         user.validatePassword(passwordEncoder, requestDto.getPassword());
 
         // 인증 매니저를 통해서 아이디, 비번을 통해 인증 진행하고 Security Context 에 저장
@@ -59,7 +61,7 @@ public class AuthService {
                         requestDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        
+
         tokenIssuanceAndSave(response, user);
 
         return "로그인 성공했습니다";
@@ -83,8 +85,33 @@ public class AuthService {
         return "토큰이 재발행 되었습니다.";
     }
 
+    @Transactional
+    public String logout(Long userId) {
+
+        User user = getUserByUserId(userId);
+
+        user.saveRefreshToken(null);
+
+        return "로그아웃을 성공했습니다";
+    }
+
+    @Transactional
+    public String withdraw(Long userId) {
+
+        User user = getUserByUserId(userId);
+
+        user.softWithdrawUser();
+
+        return "회원 탈퇴가 정상적으로 되었습니다.";
+    }
+
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
+    }
+
+    private User getUserByUserId(Long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
     }
 
@@ -107,7 +134,7 @@ public class AuthService {
                 user.getRole());
         String refreshToken = jwtProvider.createRefreshToken(user.getUsername());
 
-        user.saveToken(refreshToken);
+        user.saveRefreshToken(refreshToken);
 
         // 토큰 담아주기
         response.addHeader(JwtProvider.ACCESS_HEADER, accessToken);
@@ -115,7 +142,7 @@ public class AuthService {
     }
 
     private void validateRefreshToken(User user, String refreshToken) {
-        if (!Objects.equals(user.getToken(), refreshToken)) {
+        if (!Objects.equals(user.getRefreshToken(), refreshToken)) {
             throw new InvalidException("토큰 정보가 일치하지 않습니다.");
         }
     }
