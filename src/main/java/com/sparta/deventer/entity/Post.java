@@ -36,6 +36,13 @@ public class Post extends Timestamped{
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    public Post(String title, String content, User user, Category category) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+        this.category = category;
+    }
+
 
 
 
