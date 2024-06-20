@@ -1,5 +1,6 @@
 package com.sparta.deventer.jwt;
 
+import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.InvalidTokenException;
 import com.sparta.deventer.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
@@ -49,7 +50,7 @@ public class JwtProvider {
     }
 
     // 토큰 생성
-    public String createAccessToken(String username, Collection<? extends GrantedAuthority> role) {
+    public String createAccessToken(String username, UserRole role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
