@@ -31,3 +31,13 @@ Content-Type: application/json
   client.global.set("Authorization", response.headers.valueOf("Authorization"));
   client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
 %}
+
+### 리플레시 토큰으로 억세스토큰 재발행
+POST http://localhost:8080/auth/refresh
+Authorization:{{Authorization}}
+X-Refresh-Token:{{X-Refresh-Token}}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}

@@ -20,5 +20,4 @@ public class LoginDto {
     @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()]{8,15}$",
             message = "비밀번호는 8자이상 15자이하여야하고 영어 대소문자, 숫자, 특수문자만 사용가능합니다.")
     private String password;
-
 }
