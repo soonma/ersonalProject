@@ -3,6 +3,7 @@ package com.sparta.deventer.controller;
 import com.sparta.deventer.dto.LoginDto;
 import com.sparta.deventer.dto.SignUpUserDto;
 import com.sparta.deventer.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +33,11 @@ public class AuthController {
     public ResponseEntity<String> login(@Valid @RequestBody LoginDto requestDto,
             HttpServletResponse response) {
         return ResponseEntity.ok().body(authService.login(requestDto, response));
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<String> tokenReissue(HttpServletRequest request,
+            HttpServletResponse response) {
+        return ResponseEntity.ok().body(authService.tokenReissue(request, response));
     }
 }

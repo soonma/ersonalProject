@@ -17,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "posts")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post extends Timestamped{
+public class Post extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,8 +36,4 @@ public class Post extends Timestamped{
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-
-
-
-
 }

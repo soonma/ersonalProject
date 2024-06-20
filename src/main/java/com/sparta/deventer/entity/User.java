@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,5 +63,11 @@ public class User extends Timestamped {
 
     public void saveToken(String refreshToken) {
         this.token = refreshToken;
+    }
+
+    public void validateRefreshToken(String refreshToken) {
+        if (!Objects.equals(this.token, refreshToken)) {
+            throw new InvalidException("토큰 정보가 일치하지 않습니다.");
+        }
     }
 }
