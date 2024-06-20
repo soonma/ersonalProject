@@ -59,9 +59,8 @@ public class AuthService {
                         requestDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // 토큰 생성
-        tokenIssuance(response, user);
+        
+        tokenIssuanceAndSave(response, user);
 
         return "로그인 성공했습니다";
     }
@@ -77,9 +76,9 @@ public class AuthService {
 
         User user = getUserByUsername(refreshUsername);
 
-        user.validateRefreshToken(request.getHeader(JwtProvider.REFRESH_HEADER));
+        validateRefreshToken(user, request.getHeader(JwtProvider.REFRESH_HEADER));
 
-        tokenIssuance(response, user);
+        tokenIssuanceAndSave(response, user);
 
         return "토큰이 재발행 되었습니다.";
     }
@@ -103,7 +102,7 @@ public class AuthService {
         }
     }
 
-    private void tokenIssuance(HttpServletResponse response, User user) {
+    private void tokenIssuanceAndSave(HttpServletResponse response, User user) {
         String accessToken = jwtProvider.createAccessToken(user.getUsername(),
                 user.getRole());
         String refreshToken = jwtProvider.createRefreshToken(user.getUsername());
@@ -113,5 +112,11 @@ public class AuthService {
         // 토큰 담아주기
         response.addHeader(JwtProvider.ACCESS_HEADER, accessToken);
         response.addHeader(JwtProvider.REFRESH_HEADER, refreshToken);
+    }
+
+    private void validateRefreshToken(User user, String refreshToken) {
+        if (!Objects.equals(user.getToken(), refreshToken)) {
+            throw new InvalidException("토큰 정보가 일치하지 않습니다.");
+        }
     }
 }

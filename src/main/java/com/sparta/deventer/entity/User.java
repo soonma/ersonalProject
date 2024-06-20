@@ -64,10 +64,4 @@ public class User extends Timestamped {
     public void saveToken(String refreshToken) {
         this.token = refreshToken;
     }
-
-    public void validateRefreshToken(String refreshToken) {
-        if (!Objects.equals(this.token, refreshToken)) {
-            throw new InvalidException("토큰 정보가 일치하지 않습니다.");
-        }
-    }
 }
