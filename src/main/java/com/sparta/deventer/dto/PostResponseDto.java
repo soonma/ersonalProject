@@ -1,8 +1,8 @@
 package com.sparta.deventer.dto;
 
+
 import com.sparta.deventer.entity.Post;
 import lombok.Getter;
-
 
 @Getter
 public class PostResponseDto {
