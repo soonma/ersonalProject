@@ -1,10 +1,10 @@
 package com.sparta.deventer.dto;
 
-import com.sparta.deventer.entity.Category;
+
 import com.sparta.deventer.entity.Post;
+import lombok.Getter;
 
-import java.util.stream.Collectors;
-
+@Getter
 public class PostResponseDto {
     private Long postid;
     private String title;

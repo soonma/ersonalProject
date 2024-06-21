@@ -2,6 +2,8 @@ package com.sparta.deventer.service;
 
 import com.sparta.deventer.dto.CommentRequestDto;
 import com.sparta.deventer.dto.CommentResponseDto;
+import com.sparta.deventer.dto.PostAddCommentResponseDto;
+import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
@@ -25,15 +27,21 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
-    public List<CommentResponseDto> getCommnetList(Long postId) {
+    public PostAddCommentResponseDto getCommnetList(Long postId) {
         List<Comment> commentList = commentRepository.findAllByPostId(postId);
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()-> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
+
+        PostResponseDto postResponseDto = new PostResponseDto(post);
 
         for (Comment comment : commentList) {
             CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
             commentResponseDtoList.add(commentResponseDto);
         }
-        return commentResponseDtoList;
+        PostAddCommentResponseDto responseDto = new PostAddCommentResponseDto(postResponseDto,commentResponseDtoList);
+        return responseDto;
     }
 
     public CommentResponseDto createComment(CommentRequestDto requestDto, User user) {
