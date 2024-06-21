@@ -2,8 +2,8 @@
 @username = abcde2345
 @password = Abcdef12345!
 
-@content = 시큐리티 힘들다..
-@edit_content = edit 시큐리티 힘들다..
+@content = 시큐리티 힘들다..33
+@edit_content = edit 시큐리티 힘들다..33
 
 @post_id = 1
 
@@ -20,6 +20,10 @@ Content-Type: application/json
 
 
 
+### 게시글 댓글 조회
+GET http://localhost:8080/comments/1
+Content-Type: application/json
+
 
 ### 댓글 작성
 POST http://localhost:8080/comments
@@ -34,7 +38,7 @@ Content-Type: application/json
 
 
 ### 댓글 수정
-PUT http://localhost:8080/comments/1
+PUT http://localhost:8080/comments/2
 Authorization:{{Authorization}}
 Content-Type: application/json
 
@@ -45,11 +49,7 @@ Content-Type: application/json
 
 
 ### 댓글 삭제
-DELETE http://localhost:8080/comments/1
+DELETE http://localhost:8080/comments/4
 Authorization:{{Authorization}}
 Content-Type: application/json
 
-
-
-### 댓글 조회
-GET http://localhost:8080/comments/1
