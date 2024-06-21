@@ -87,4 +87,6 @@ public class User extends Timestamped {
             throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
         }
     }
+
+
 }
