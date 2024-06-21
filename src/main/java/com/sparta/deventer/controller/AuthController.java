@@ -1,7 +1,8 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.dto.LoginDto;
-import com.sparta.deventer.dto.SignUpUserDto;
+import com.sparta.deventer.dto.AdminSignUpRequestDto;
+import com.sparta.deventer.dto.LoginRequestDto;
+import com.sparta.deventer.dto.UserSignUpRequestDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    
+
     @PostMapping("/auth/sign-up")
-    public ResponseEntity<String> signUp(@Valid @RequestBody SignUpUserDto requestDto) {
-        return ResponseEntity.ok().body(authService.signUp(requestDto));
+    public ResponseEntity<String> userSignUp(@Valid @RequestBody UserSignUpRequestDto requestDto) {
+        return ResponseEntity.ok().body(authService.userSignUp(requestDto));
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto requestDto,
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDto requestDto,
             HttpServletResponse response) {
         return ResponseEntity.ok().body(authService.login(requestDto, response));
     }
@@ -46,5 +47,11 @@ public class AuthController {
     @DeleteMapping("/auth/withdraw")
     public ResponseEntity<String> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(authService.withdraw(userDetails.getUser().getId()));
+    }
+
+    @PostMapping("/auth/sign-up/admin")
+    public ResponseEntity<String> AdminSignUp(
+            @Valid @RequestBody AdminSignUpRequestDto requestDto) {
+        return ResponseEntity.ok().body(authService.adminSignUp(requestDto));
     }
 }
