@@ -31,9 +31,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+    /**
+     * 관리자 가입용 인증키
+     */
     @Value("${admin.code}")
     private String adminCode;
 
+    /**
+     * 일반 유저 로그인 로직
+     *
+     * @param requestDto 일반유저 회원가입 Request
+     * @return 완료 메세지
+     */
     public String userSignUp(UserSignUpRequestDto requestDto) {
 
         checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
@@ -47,6 +56,12 @@ public class AuthService {
         return "회원가입이 완료되었습니다.";
     }
 
+    /**
+     * 관리자 로그인 로직
+     *
+     * @param requestDto 관리자 회원가입 Request
+     * @return 완료 메세지
+     */
     public String adminSignUp(AdminSignUpRequestDto requestDto) {
 
         if (!Objects.equals(requestDto.getAdminCode(), adminCode)) {
@@ -64,6 +79,13 @@ public class AuthService {
         return "관리자 권한으로 회원가입 되었습니다.";
     }
 
+    /**
+     * 로그인 로직
+     *
+     * @param requestDto 로그인 Request
+     * @param response   토큰을 담기위한 Response
+     * @return 완료 메세지
+     */
     @Transactional
     public String login(LoginRequestDto requestDto, HttpServletResponse response) {
 
@@ -85,6 +107,13 @@ public class AuthService {
         return "로그인 성공했습니다";
     }
 
+    /**
+     * 토큰 재발행 로직
+     *
+     * @param request  기존의 토큰이 담겨있는 Request
+     * @param response 새로운 토큰을 담아줄 Response
+     * @return 완료 메세지
+     */
     @Transactional
     public String tokenReissue(HttpServletRequest request, HttpServletResponse response) {
 
@@ -96,13 +125,19 @@ public class AuthService {
 
         User user = getUserByUsername(refreshUsername);
 
-        validateRefreshToken(user, request.getHeader(JwtProvider.REFRESH_HEADER));
+        validateRefreshToken(user.getRefreshToken(), request.getHeader(JwtProvider.REFRESH_HEADER));
 
         tokenIssuanceAndSave(response, user);
 
         return "토큰이 재발행 되었습니다.";
     }
 
+    /**
+     * 로그아웃 로직
+     *
+     * @param userId 시큐리티 컨택스트에서 가져온 유저의 PK (유저를 직접 가져와도 준영속성 상태라 어차피 영속성 상태로 만들어야함)
+     * @return 완료 메세지
+     */
     @Transactional
     public String logout(Long userId) {
 
@@ -113,6 +148,12 @@ public class AuthService {
         return "로그아웃을 성공했습니다";
     }
 
+    /**
+     * 회원 탈퇴 로직
+     *
+     * @param userId 시큐리티 컨택스트에서 가져온 유저의 PK
+     * @return 완료메세지
+     */
     @Transactional
     public String withdraw(Long userId) {
 
@@ -123,6 +164,13 @@ public class AuthService {
         return "회원 탈퇴가 정상적으로 되었습니다.";
     }
 
+    /**
+     * 아이디, 닉네임, 이메일 중복확인 기능 (API 로 따로따로 기능을빼서 만드는 것이 더 적절해보임)
+     *
+     * @param username 유저의 로그인 ID
+     * @param nickname 유저의 닉네임
+     * @param email    유저의 이메일
+     */
     private void checkDuplicateUser(String username, String nickname, String email) {
         if (userRepository.existsByUsername(username)) {
             throw new DuplicateException("ID가 중복됩니다.");
@@ -137,6 +185,16 @@ public class AuthService {
         }
     }
 
+    /**
+     * 유저 객체 생성 로직
+     *
+     * @param username 유저 로그인 ID
+     * @param password 유저 비밀번호
+     * @param nickname 유저 닉네임
+     * @param role     유저 권한
+     * @param email    유저 이메일
+     * @return 유저 객체
+     */
     private User createUser(String username, String password, String nickname, UserRole role,
             String email) {
         return new User(
@@ -148,16 +206,34 @@ public class AuthService {
         );
     }
 
+    /**
+     * 유저 객체 유저 로그인 ID로 찾아오기
+     *
+     * @param username 유저 로그인 ID
+     * @return 유저 객체
+     */
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
     }
 
+    /**
+     * 유저 객체 PK로 찾아오
+     *
+     * @param userId 유저 고유번호 (PK)
+     * @return 유저 객체
+     */
     private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
     }
 
+    /**
+     * 토큰 발행 로직
+     *
+     * @param response 토큰을 담아줄 Response
+     * @param user     리플레시 토큰정보를 저장할 User 객체
+     */
     private void tokenIssuanceAndSave(HttpServletResponse response, User user) {
         String accessToken = jwtProvider.createAccessToken(user.getUsername(),
                 user.getRole());
@@ -170,8 +246,14 @@ public class AuthService {
         response.addHeader(JwtProvider.REFRESH_HEADER, refreshToken);
     }
 
-    private void validateRefreshToken(User user, String refreshToken) {
-        if (!Objects.equals(user.getRefreshToken(), refreshToken)) {
+    /**
+     * 토큰 비교로직
+     *
+     * @param user         리플레시토큰을 가지고 있는 유저객체
+     * @param refreshToken 비교할 리플레시토큰
+     */
+    private void validateRefreshToken(String userRefreshToken, String refreshToken) {
+        if (!Objects.equals(userRefreshToken, refreshToken)) {
             throw new InvalidException("토큰 정보가 일치하지 않습니다.");
         }
     }
