@@ -2,6 +2,7 @@ package com.sparta.deventer.controller;
 
 import com.sparta.deventer.dto.ChangePasswordRequestDto;
 import com.sparta.deventer.dto.ProfileResponseDto;
+import com.sparta.deventer.dto.UpdateProfileRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.exception.UserNotFoundException;
 import com.sparta.deventer.repository.UserRepository;
@@ -28,6 +29,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<Object> getProfile(@PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         User user = getUserFromUserDetails(userDetails);
         ProfileResponseDto profileResponseDto = userService.getProfile(userId, user);
         return ResponseEntity.ok(profileResponseDto);
@@ -35,9 +37,12 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateProfile(@PathVariable Long userId,
+        @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         User user = getUserFromUserDetails(userDetails);
-        ProfileResponseDto profileResponseDto = userService.updateProfile(userId, user);
+        ProfileResponseDto profileResponseDto = userService.updateProfile(userId,
+            updateProfileRequestDto, user);
         return ResponseEntity.ok(profileResponseDto);
     }
 
@@ -45,6 +50,7 @@ public class UserController {
     public ResponseEntity<Object> changePassword(@PathVariable Long userId,
         @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         User user = getUserFromUserDetails(userDetails);
         userService.changePassword(userId, changePasswordRequestDto, user);
         return ResponseEntity.noContent().build();
