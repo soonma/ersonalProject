@@ -8,15 +8,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "password_history") // 복수형?
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "password_histories") // 복수형?
 public class PasswordHistory {
 
     @Id

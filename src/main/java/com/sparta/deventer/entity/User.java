@@ -1,6 +1,7 @@
 package com.sparta.deventer.entity;
 
 import com.sparta.deventer.enums.UserRole;
+import com.sparta.deventer.exception.AlreadyWithdrawnException;
 import com.sparta.deventer.exception.InvalidException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,7 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,8 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User extends Timestamped {
 
@@ -44,11 +45,13 @@ public class User extends Timestamped {
     private UserRole role;
 
     @Column(unique = true)
-    private String token;
+    private String refreshToken;
 
     @Column(nullable = false, unique = true)
     @Setter
     private String email;
+
+    private LocalDateTime deletedAt;
 
     public User(String username, String password, String nickname, UserRole role, String email) {
         this.username = username;
@@ -56,7 +59,7 @@ public class User extends Timestamped {
         this.nickname = nickname;
         this.email = email;
         this.role = role;
-        this.token = null;
+        this.refreshToken = null;
     }
 
     public void validatePassword(PasswordEncoder passwordEncoder, String password) {
@@ -65,7 +68,17 @@ public class User extends Timestamped {
         }
     }
 
-    public void saveToken(String refreshToken) {
-        this.token = refreshToken;
+    public void saveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void softWithdrawUser() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public void checkUserWithdrawn() {
+        if (this.deletedAt != null) {
+            throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
+        }
     }
 }

@@ -8,16 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Post extends Timestamped{
+public class Post extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,7 +36,16 @@ public class Post extends Timestamped{
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    public Post(String title, String content, User user, Category category) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+        this.category = category;
+    }
 
-
-
+    public void update(String title, String content, Category category) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
 }
