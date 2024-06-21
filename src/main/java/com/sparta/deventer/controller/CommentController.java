@@ -2,6 +2,7 @@ package com.sparta.deventer.controller;
 
 import com.sparta.deventer.dto.CommentRequestDto;
 import com.sparta.deventer.dto.CommentResponseDto;
+import com.sparta.deventer.dto.PostAddCommentResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.CommentService;
 import java.util.List;
@@ -29,9 +30,9 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<List<CommentResponseDto>> getCommentList(@PathVariable Long postId) {
-        List<CommentResponseDto> commentList = commentService.getCommnetList(postId);
-        return ResponseEntity.ok().body(commentList);
+    public ResponseEntity<PostAddCommentResponseDto> getCommentList(@PathVariable Long postId) {
+        PostAddCommentResponseDto responseDto = commentService.getCommnetList(postId);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @PostMapping
@@ -66,6 +67,4 @@ public class CommentController {
         commentService.deleteComment(userDetails.getUser(),id);
         return "삭제가 완료 되었습니다.";
     }
-
-
 }
