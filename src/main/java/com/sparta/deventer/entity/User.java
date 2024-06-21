@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
@@ -31,19 +32,23 @@ public class User extends Timestamped {
     private String username;
 
     @Column(nullable = false)
+    @Setter
     private String password;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String nickname;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private UserRole role;
 
     @Column(unique = true)
     private String refreshToken;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String email;
 
     private LocalDateTime deletedAt;

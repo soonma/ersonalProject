@@ -22,9 +22,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<Object> handleInvalidPasswordException(InvalidPasswordException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException e) {
+        MethodArgumentNotValidException e) {
         List<String> errorMessages = new ArrayList<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
@@ -39,6 +44,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
     @ExceptionHandler(AlreadyWithdrawnException.class)
     public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
