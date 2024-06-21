@@ -39,4 +39,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(AlreadyWithdrawnException.class)
+    public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }
