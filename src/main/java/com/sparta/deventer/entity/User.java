@@ -68,6 +68,12 @@ public class User extends Timestamped {
         }
     }
 
+    public void validateId(Long id) {
+        if (!id.equals(this.getId())) {
+            throw new IllegalArgumentException("자신의 정보만 수정할 수 있습니다.");
+        }
+    }
+
     public void saveRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
@@ -81,4 +87,6 @@ public class User extends Timestamped {
             throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
         }
     }
+
+
 }
