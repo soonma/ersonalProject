@@ -30,4 +30,10 @@ public class PasswordHistory {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public PasswordHistory(String password, User user) {
+        this.password = password;
+        this.createdAt = LocalDateTime.now();
+        this.user = user;
+    }
 }
