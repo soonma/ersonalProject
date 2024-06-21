@@ -2,20 +2,13 @@ package com.sparta.deventer.service;
 
 import com.sparta.deventer.dto.CommentRequestDto;
 import com.sparta.deventer.dto.CommentResponseDto;
-import com.sparta.deventer.dto.PostAddCommentResponseDto;
-import com.sparta.deventer.dto.PostResponseDto;
-import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
-import com.sparta.deventer.repository.CategoryRepository;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PostRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,55 +20,54 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
-    public PostAddCommentResponseDto getCommnetList(Long postId) {
-        List<Comment> commentList = commentRepository.findAllByPostId(postId);
-        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
-
-        PostResponseDto postResponseDto = new PostResponseDto(post);
-
-        for (Comment comment : commentList) {
-            CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
-            commentResponseDtoList.add(commentResponseDto);
-        }
-        PostAddCommentResponseDto responseDto = new PostAddCommentResponseDto(postResponseDto,commentResponseDtoList);
-        return responseDto;
-    }
-
     public CommentResponseDto createComment(CommentRequestDto requestDto, User user) {
 
-        Post post = postRepository.findById(requestDto.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
+        Post post = validPostId(requestDto.getPostId());
 
         Comment comment = new Comment(post, user, requestDto.getContent());
+
         log.info("Creating comment {}", comment.getUser().getUsername());
+
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
-
 
     }
 
     @Transactional
-    public CommentResponseDto updateComment(User user, CommentRequestDto requestDto, Long id) {
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
+    public CommentResponseDto updateComment(Long userId, CommentRequestDto requestDto,
+            Long postId) {
+        Comment comment = validCommentId(postId);
 
-        if (comment.getUser().getId() != user.getId()) {
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
-        }
+        validUserId(comment, userId);
+
         comment.update(requestDto.getContent());
-        commentRepository.save(comment);
+
         return new CommentResponseDto(comment);
     }
 
-    public void deleteComment(User user, Long id) {
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
-        if (comment.getUser().getId() != user.getId()) {
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
-        }
+    public void deleteComment(Long userId, Long postId) {
+        Comment comment = validCommentId(postId);
+
+        validUserId(comment, userId);
+
         commentRepository.delete(comment);
     }
+
+
+    public Comment validCommentId(Long Id) {
+        return commentRepository.findById(Id)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
+    }
+
+    public void validUserId(Comment comment, Long userId) {
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+        }
+    }
+
+    public Post validPostId(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
+    }
+
 }

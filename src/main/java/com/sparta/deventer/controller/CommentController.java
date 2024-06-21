@@ -2,18 +2,13 @@ package com.sparta.deventer.controller;
 
 import com.sparta.deventer.dto.CommentRequestDto;
 import com.sparta.deventer.dto.CommentResponseDto;
-import com.sparta.deventer.dto.PostAddCommentResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.CommentService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,12 +24,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<PostAddCommentResponseDto> getCommentList(@PathVariable Long postId) {
-        PostAddCommentResponseDto responseDto = commentService.getCommnetList(postId);
-        return ResponseEntity.ok().body(responseDto);
-    }
-
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -45,26 +34,24 @@ public class CommentController {
 
         CommentResponseDto commentResponseDto = commentService.createComment(requestDto,
                 userDetails.getUser());
-
         return ResponseEntity.ok().body(commentResponseDto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CommentResponseDto> upateComment(
+    @PutMapping("/{postId}")
+    public ResponseEntity<CommentResponseDto> updateComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDto requestDto,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long postId) {
         return ResponseEntity.ok()
-                .body(commentService.updateComment(userDetails.getUser(), requestDto, id));
+                .body(commentService.updateComment(userDetails.getUser().getId(), requestDto,
+                        postId));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{postId}")
     public String deleteComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long id
-    ) {
-        commentService.deleteComment(userDetails.getUser(),id);
+            @PathVariable Long postId) {
+        commentService.deleteComment(userDetails.getUser().getId(), postId);
         return "삭제가 완료 되었습니다.";
     }
 }

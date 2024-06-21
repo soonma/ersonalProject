@@ -1,12 +1,14 @@
 ## Variables
-@username = abcde2345
+@username = user2345
 @password = Abcdef12345!
 
-@content = 시큐리티 힘들다..33
+@content = 시큐리티 힘들다..331122
 @edit_content = edit 시큐리티 힘들다..33
 
 @post_id = 1
 
+@title = 제목
+@id = 1
 ###  로그인
 POST http://localhost:8080/auth/login
 Content-Type: application/json
@@ -16,12 +18,14 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-> {% client.global.set("Authorization", response.headers.valueOf("Authorization")); %}
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+%}
 
 
 
 ### 게시글 댓글 조회
-GET http://localhost:8080/comments/1
+GET http://localhost:8080/posts/1
 Content-Type: application/json
 
 
@@ -38,7 +42,7 @@ Content-Type: application/json
 
 
 ### 댓글 수정
-PUT http://localhost:8080/comments/2
+PUT http://localhost:8080/comments/1
 Authorization:{{Authorization}}
 Content-Type: application/json
 
@@ -53,3 +57,13 @@ DELETE http://localhost:8080/comments/4
 Authorization:{{Authorization}}
 Content-Type: application/json
 
+### 게시글 작성
+POST http://localhost:8080/posts
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "{{title}}",
+  "content": "{{content}}",
+  "categoryId": {{id}}
+}
