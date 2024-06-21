@@ -32,4 +32,14 @@ public class Comment extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    public Comment(Post post, User user, String content) {
+        this.post = post;
+        this.user = user;
+        this.content = content;
+    }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

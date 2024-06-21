@@ -22,4 +22,9 @@ public class Category {
 
     @Column(nullable = false)
     private String topic;
+
+    //테스트용
+    public Category(String topic) {
+        this.topic = topic;
+    }
 }
