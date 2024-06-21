@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "posts")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post extends Timestamped{
+public class Post extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +43,9 @@ public class Post extends Timestamped{
         this.category = category;
     }
 
-
-
-
+    public void update(String title, String content, Category category) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
 }

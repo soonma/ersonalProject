@@ -1,16 +1,15 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.dto.CreatePostRequestDto;
+import com.sparta.deventer.dto.PostRequestDto;
+import com.sparta.deventer.dto.PostResponseDto;
+import com.sparta.deventer.dto.UpdatePostRequestsDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/posts")
@@ -22,10 +21,20 @@ public class PostController {
     // 게시글 생성
     @PostMapping
     public ResponseEntity<String> createPost(
-            @RequestBody CreatePostRequestDto createPostRequestDto,
+            @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        postService.createPost(createPostRequestDto, userDetails.getUser());
+        postService.createPost(postRequestDto, userDetails.getUser());
         return new ResponseEntity<>("게시글이 성공적으로 작성되었습니다.", HttpStatus.CREATED);
+    }
+    // 게시글 수정
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody UpdatePostRequestsDto updatePostRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        PostResponseDto postResponseDto = postService.updatePost(postId, updatePostRequestDto, userDetails.getUser());
+        return new ResponseEntity<>(postResponseDto, HttpStatus.OK);
     }
 }

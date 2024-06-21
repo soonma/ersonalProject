@@ -7,12 +7,12 @@ public class PostResponseDto {
     private Long postid;
     private String title;
     private String content;
-    private Category category;
+    private String categoryTopic;
 
     public PostResponseDto(Post post) {
         this.postid = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.category = post.getCategory();
+        this.categoryTopic = post.getCategory().getTopic();
     }
 }
