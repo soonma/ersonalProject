@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
@@ -30,19 +31,23 @@ public class User extends Timestamped {
     private String username;
 
     @Column(nullable = false)
+    @Setter
     private String password;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String nickname;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private UserRole role;
 
     @Column(unique = true)
     private String token;
 
     @Column(nullable = false, unique = true)
+    @Setter
     private String email;
 
     public User(String username, String password, String nickname, UserRole role, String email) {
