@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws IOException, ServletException {
 
         // 헤더에서 토큰 가져오기
-        String token = jwtProvider.getJwtFromHeader(request);
+        String token = jwtProvider.getJwtFromHeader(request, JwtProvider.ACCESS_HEADER);
 
         // 토큰 유효성 확인
         if (StringUtils.hasText(token)) {
