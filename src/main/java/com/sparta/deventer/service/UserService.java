@@ -49,9 +49,9 @@ public class UserService {
 
         user.validatePassword(passwordEncoder, currentPassword);
         validateNewPassword(user, newPassword);
-        validatePasswordHistory(user, newPassword, passwordHistoryList);
+        validatePasswordHistory(newPassword, passwordHistoryList);
 
-        PasswordHistory newHistory = new PasswordHistory(newPassword, user);
+        PasswordHistory newHistory = new PasswordHistory(passwordEncoder.encode(newPassword), user);
         passwordHistoryRepository.save(newHistory);
 
         if (passwordHistoryList.size() > 3) {
@@ -68,7 +68,7 @@ public class UserService {
         }
     }
 
-    public void validatePasswordHistory(User user, String newPassword,
+    public void validatePasswordHistory(String newPassword,
         List<PasswordHistory> passwordHistoryList) {
 
         for (PasswordHistory passwordHistory : passwordHistoryList) {
