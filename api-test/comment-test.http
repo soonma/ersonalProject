@@ -1,0 +1,55 @@
+## Variables
+@username = abcde2345
+@password = Abcdef12345!
+
+@content = 시큐리티 힘들다..
+@edit_content = edit 시큐리티 힘들다..
+
+@post_id = 1
+
+###  로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {% client.global.set("Authorization", response.headers.valueOf("Authorization")); %}
+
+
+
+
+### 댓글 작성
+POST http://localhost:8080/comments
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": "{{post_id}}",
+  "content": "{{content}}"
+}
+
+
+
+### 댓글 수정
+PUT http://localhost:8080/comments/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+{
+  "postId": {{post_id}},
+  "content": "{{edit_content}}"
+}
+
+
+### 댓글 삭제
+DELETE http://localhost:8080/comments/1
+Authorization:{{Authorization}}
+Content-Type: application/json
+
+
+
+### 댓글 조회
+GET http://localhost:8080/comments/1

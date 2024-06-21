@@ -1,6 +1,7 @@
 package com.sparta.deventer.entity;
 
 import com.sparta.deventer.enums.UserRole;
+import com.sparta.deventer.exception.InvalidException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -40,6 +42,25 @@ public class User extends Timestamped {
     @Column(unique = true)
     private String token;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
+
+    public User(String username, String password, String nickname, UserRole role, String email) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.role = role;
+        this.token = null;
+    }
+
+    public void validatePassword(PasswordEncoder passwordEncoder, String password) {
+        if (!passwordEncoder.matches(password, this.password)) {
+            throw new InvalidException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    public void saveToken(String refreshToken) {
+        this.token = refreshToken;
+    }
 }
