@@ -1,7 +1,8 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.LoginDto;
-import com.sparta.deventer.dto.SignUpUserDto;
+import com.sparta.deventer.dto.AdminSignUpRequestDto;
+import com.sparta.deventer.dto.LoginRequestDto;
+import com.sparta.deventer.dto.UserSignUpRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.DuplicateException;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,25 +31,41 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public String signUp(SignUpUserDto requestDto) {
+    @Value("${admin.code}")
+    private String adminCode;
 
-        checkDuplicateUser(requestDto);
+    public String userSignUp(UserSignUpRequestDto requestDto) {
 
-        User user = new User(
-                requestDto.getUsername(),
-                passwordEncoder.encode(requestDto.getPassword()),
-                requestDto.getNickname(),
-                UserRole.USER,
-                requestDto.getEmail()
-        );
+        checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
+                requestDto.getEmail());
+
+        User user = createUser(requestDto.getUsername(), requestDto.getPassword(),
+                requestDto.getNickname(), UserRole.USER, requestDto.getEmail());
 
         userRepository.save(user);
 
         return "회원가입이 완료되었습니다.";
     }
 
+    public String adminSignUp(AdminSignUpRequestDto requestDto) {
+
+        if (!Objects.equals(requestDto.getAdminCode(), adminCode)) {
+            throw new InvalidException("관리자 키가 일치하지 않습니다.");
+        }
+
+        checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
+                requestDto.getEmail());
+
+        User user = createUser(requestDto.getUsername(), requestDto.getPassword(),
+                requestDto.getNickname(), UserRole.ADMIN, requestDto.getEmail());
+
+        userRepository.save(user);
+
+        return "관리자 권한으로 회원가입 되었습니다.";
+    }
+
     @Transactional
-    public String login(LoginDto requestDto, HttpServletResponse response) {
+    public String login(LoginRequestDto requestDto, HttpServletResponse response) {
 
         User user = getUserByUsername(requestDto.getUsername());
 
@@ -105,6 +123,31 @@ public class AuthService {
         return "회원 탈퇴가 정상적으로 되었습니다.";
     }
 
+    private void checkDuplicateUser(String username, String nickname, String email) {
+        if (userRepository.existsByUsername(username)) {
+            throw new DuplicateException("ID가 중복됩니다.");
+        }
+
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicateException("닉네임이 중복됩니다.");
+        }
+
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateException("이메일이 중복됩니다.");
+        }
+    }
+
+    private User createUser(String username, String password, String nickname, UserRole role,
+            String email) {
+        return new User(
+                username,
+                passwordEncoder.encode(password),
+                nickname,
+                role,
+                email
+        );
+    }
+
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
@@ -113,20 +156,6 @@ public class AuthService {
     private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
-    }
-
-    private void checkDuplicateUser(SignUpUserDto requestDto) {
-        if (userRepository.existsByUsername(requestDto.getUsername())) {
-            throw new DuplicateException("ID가 중복됩니다.");
-        }
-
-        if (userRepository.existsByNickname(requestDto.getNickname())) {
-            throw new DuplicateException("닉네임이 중복됩니다.");
-        }
-
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new DuplicateException("이메일이 중복됩니다.");
-        }
     }
 
     private void tokenIssuanceAndSave(HttpServletResponse response, User user) {

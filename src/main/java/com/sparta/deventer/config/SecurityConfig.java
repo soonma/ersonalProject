@@ -44,7 +44,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/sign-up").permitAll()
-                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers("/auth/sign-up/admin").permitAll()
+                        .requestMatchers(HttpMethod.GET)
+                        .permitAll() // Post, Comment 조회기능만 통과하도록 추후 변경
                         .anyRequest().authenticated()
         ).authenticationProvider(authenticationProvider);
 
