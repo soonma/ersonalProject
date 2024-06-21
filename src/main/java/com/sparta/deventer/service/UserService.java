@@ -12,7 +12,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,16 +21,15 @@ public class UserService {
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(Long userId, User user) {
-        validateUser(userId, user);
+        user.validateId(userId);
         return new ProfileResponseDto(user);
     }
 
     public ProfileResponseDto updateProfile(Long userId,
         UpdateProfileRequestDto updateProfileRequestDto, User user) {
 
-        validateUser(userId, user);
+        user.validateId(userId);
 
         user.setNickname(updateProfileRequestDto.getNickname());
         user.setEmail(updateProfileRequestDto.getEmail());
@@ -42,32 +40,26 @@ public class UserService {
     public void changePassword(Long userId, ChangePasswordRequestDto changePasswordRequestDto,
         User user) {
 
-        validateUser(userId, user);
+        user.validateId(userId);
 
         String currentPassword = changePasswordRequestDto.getCurrentPassword();
         String newPassword = changePasswordRequestDto.getNewPassword();
+        List<PasswordHistory> passwordHistoryList =
+            passwordHistoryRepository.findByUserOrderByCreatedAtAsc(user);
 
         user.validatePassword(passwordEncoder, currentPassword);
         validateNewPassword(user, newPassword);
-        validatePasswordHistory(user, newPassword);
+        validatePasswordHistory(user, newPassword, passwordHistoryList);
 
-        PasswordHistory newHistory = new PasswordHistory(user.getPassword(), user);
+        PasswordHistory newHistory = new PasswordHistory(newPassword, user);
         passwordHistoryRepository.save(newHistory);
 
-        List<PasswordHistory> histories =
-            passwordHistoryRepository.findByUserOrderByCreatedAtAsc(user);
-        if (histories.size() > 3) {
-            passwordHistoryRepository.delete(histories.get(0));
+        if (passwordHistoryList.size() > 3) {
+            passwordHistoryRepository.delete(passwordHistoryList.get(0));
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-    }
-
-    private void validateUser(Long userId, User user) {
-        if (!userId.equals(user.getId())) {
-            throw new IllegalArgumentException("자신의 정보만 수정할 수 있습니다.");
-        }
     }
 
     private void validateNewPassword(User user, String newPassword) {
@@ -76,9 +68,8 @@ public class UserService {
         }
     }
 
-    public void validatePasswordHistory(User user, String newPassword) {
-        List<PasswordHistory> passwordHistoryList =
-            passwordHistoryRepository.findByUserOrderByCreatedAtAsc(user);
+    public void validatePasswordHistory(User user, String newPassword,
+        List<PasswordHistory> passwordHistoryList) {
 
         for (PasswordHistory passwordHistory : passwordHistoryList) {
             if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {
