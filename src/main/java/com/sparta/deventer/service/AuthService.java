@@ -6,11 +6,15 @@ import com.sparta.deventer.dto.UserSignUpRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.DuplicateException;
-import com.sparta.deventer.exception.InvalidException;
+import com.sparta.deventer.exception.InvalidAdminCodeException;
+import com.sparta.deventer.exception.InvalidTokenException;
+import com.sparta.deventer.exception.UserNotFoundException;
 import com.sparta.deventer.jwt.JwtProvider;
 import com.sparta.deventer.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +69,7 @@ public class AuthService {
     public String adminSignUp(AdminSignUpRequestDto requestDto) {
 
         if (!Objects.equals(requestDto.getAdminCode(), adminCode)) {
-            throw new InvalidException("관리자 키가 일치하지 않습니다.");
+            throw new InvalidAdminCodeException("관리자 키가 일치하지 않습니다.");
         }
 
         checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
@@ -172,16 +176,22 @@ public class AuthService {
      * @param email    유저의 이메일
      */
     private void checkDuplicateUser(String username, String nickname, String email) {
+        List<String> duplicateMessage = new ArrayList<>(3);
+
         if (userRepository.existsByUsername(username)) {
-            throw new DuplicateException("ID가 중복됩니다.");
+            duplicateMessage.add("ID가 중복됩니다.");
         }
 
         if (userRepository.existsByNickname(nickname)) {
-            throw new DuplicateException("닉네임이 중복됩니다.");
+            duplicateMessage.add("닉네임이 중복됩니다.");
         }
 
         if (userRepository.existsByEmail(email)) {
-            throw new DuplicateException("이메일이 중복됩니다.");
+            duplicateMessage.add("이메일이 중복됩니다.");
+        }
+
+        if (!duplicateMessage.isEmpty()) {
+            throw new DuplicateException(duplicateMessage);
         }
     }
 
@@ -214,7 +224,7 @@ public class AuthService {
      */
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 존재하지 않습니다."));
     }
 
     /**
@@ -225,7 +235,7 @@ public class AuthService {
      */
     private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 존재하지 않습니다."));
     }
 
     /**
@@ -254,7 +264,7 @@ public class AuthService {
      */
     private void validateRefreshToken(String userRefreshToken, String refreshToken) {
         if (!Objects.equals(userRefreshToken, refreshToken)) {
-            throw new InvalidException("토큰 정보가 일치하지 않습니다.");
+            throw new InvalidTokenException("토큰 정보가 일치하지 않습니다.");
         }
     }
 }
