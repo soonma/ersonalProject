@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -22,9 +23,11 @@ public class Post extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(nullable = false)
     private String title;
 
+    @Setter
     @Column(nullable = false)
     private String content;
 
@@ -40,12 +43,6 @@ public class Post extends Timestamped {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.category = category;
-    }
-
-    public void update(String title, String content, Category category) {
-        this.title = title;
-        this.content = content;
         this.category = category;
     }
 }
