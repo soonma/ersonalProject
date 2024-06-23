@@ -1,8 +1,16 @@
 package com.sparta.deventer.exception;
 
-public class DuplicateException extends RuntimeException{
+import java.util.List;
 
-    public DuplicateException(String message) {
-        super(message);
+public class DuplicateException extends RuntimeException {
+
+    private List<String> errorMessages;
+
+    public DuplicateException(List<String> errorMessageList) {
+        this.errorMessages = errorMessageList;
+    }
+
+    public List<String> getErrorMessages() {
+        return errorMessages;
     }
 }
