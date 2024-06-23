@@ -1,6 +1,7 @@
 package com.sparta.deventer.controller;
 
 import com.sparta.deventer.dto.ChangePasswordRequestDto;
+import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.dto.ProfileResponseDto;
 import com.sparta.deventer.dto.UpdateProfileRequestDto;
@@ -47,6 +48,18 @@ public class UserController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<PostResponseDto> postResponseDtoPage = userService.getAllPosts(userId, user, pageable);
         return ResponseEntity.ok(postResponseDtoPage);
+    }
+
+    @GetMapping("/{userId}/comments")
+    public ResponseEntity<Object> getAllComments(@PathVariable Long userId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(defaultValue = "0") int page) {
+
+        User user = userDetails.getUser();
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<CommentResponseDto> commentResponseDtoPage = userService.getAllComments(userId, user,
+            pageable);
+        return ResponseEntity.ok(commentResponseDtoPage);
     }
 
     @PutMapping("/{userId}")
