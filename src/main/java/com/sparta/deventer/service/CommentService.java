@@ -5,6 +5,8 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
+import com.sparta.deventer.exception.CommentNotFoundException;
+import com.sparta.deventer.exception.PostNotFoundException;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +58,7 @@ public class CommentService {
 
     public Comment emptyCheckComment(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
+                .orElseThrow(() -> new CommentNotFoundException("댓글을 찾을수 없습니다"));
     }
 
     public void checkEqualsUser(Comment comment, Long userId) {
@@ -67,7 +69,7 @@ public class CommentService {
 
     public Post checkEmptyPost(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
+                .orElseThrow(() -> new PostNotFoundException("게시글이 존재 하지 않습니다."));
     }
 
 }
