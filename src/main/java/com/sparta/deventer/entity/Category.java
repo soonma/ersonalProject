@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "categories")
-public class Category {
+public class Category extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
