@@ -23,19 +23,21 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping
-    public ResponseEntity<String> createPost(
+    public ResponseEntity<PostResponseDto> createPost(
             @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        postService.createPost(postRequestDto, userDetails.getUser());
-        return new ResponseEntity<>("게시글이 성공적으로 작성되었습니다.", HttpStatus.CREATED);
+        PostResponseDto postResponseDto =  postService.createPost(postRequestDto, userDetails.getUser());
+        return ResponseEntity.ok().body(postResponseDto);
     }
-    @GetMapping
+    //게시글 조회
+    @GetMapping("/{postId}")
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<PostResponseDto> posts = postService.getAllPosts(pageable);
         return ResponseEntity.ok(posts);
     }
+    //카테고리 별 게시글 조회
     @GetMapping(params = "category")
     public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(@RequestParam Long category,
                                                                     @RequestParam(defaultValue = "0") int page) {

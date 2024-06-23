@@ -9,8 +9,11 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post>{
+import java.util.Optional;
+
+public interface PostRepository extends JpaRepository<Post, Long>{
     Page<Post> findAllByCategory(Category category, Pageable pageable);
     Page<Post> findAll(Pageable pageable);
+    Optional<Post> findById(Long postid);
 
 }

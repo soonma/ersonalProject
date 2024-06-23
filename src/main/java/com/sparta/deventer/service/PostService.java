@@ -1,8 +1,6 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.PostRequestDto;
-import com.sparta.deventer.dto.PostResponseDto;
-import com.sparta.deventer.dto.UpdatePostRequestsDto;
+import com.sparta.deventer.dto.*;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
@@ -21,20 +19,24 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
 
+
     // 게시글 생성
     public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
-        Category category = categoryRepository.findById(postRequestDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("카테고리를 찾을 수 없습니다."));
+        Category category = categoryRepository.findByTopic(postRequestDto.getCategoryTopic())
+                .orElseThrow(() -> new DataNotFoundException("카테고리를 찾을 수 없습니다."));
+
 
         Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), user, category);
         postRepository.save(post);
         return new PostResponseDto(post);
     }
+
     // 전체 게시글 조회
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable)
                 .map(PostResponseDto::new);
     }
+
     // 카테고리 내의 게시글 조회
     public Page<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
@@ -42,14 +44,6 @@ public class PostService {
 
         return postRepository.findAllByCategory(category, pageable)
                 .map(PostResponseDto::new);
-    }
-    // 게시글 단일 조회
-    public PostResponseDto getPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new DataNotFoundException("게시글을 찾을 수 없습니다."));
-
-        // 댓글을 포함하도록 확장 필요
-       return new PostResponseDto(post);
     }
 
     // 게시글 수정
@@ -69,6 +63,7 @@ public class PostService {
         postRepository.save(post);
         return new PostResponseDto(post);
     }
+
     //게시글 삭제
     public void deletePost(Long postId, User user) {
         Post post = postRepository.findById(postId)
