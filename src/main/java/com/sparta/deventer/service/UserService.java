@@ -72,7 +72,7 @@ public class UserService {
         PasswordHistory newHistory = new PasswordHistory(passwordEncoder.encode(newPassword), user);
         passwordHistoryRepository.save(newHistory);
 
-        if (passwordHistoryList.size() > 3) {
+        if (passwordHistoryList.size() > 2) {
             passwordHistoryRepository.delete(passwordHistoryList.get(0));
         }
 
