@@ -23,6 +23,8 @@
 
 @postId = 1
 
+@categoryId = 1
+
 @admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT09
 
 # 일반권한인 유저 테스트입니다.
@@ -53,12 +55,27 @@ Content-Type: application/json
 }
 
 
-### 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
+### 일반 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
 POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
   "username":"{{username}}",
+  "password":"{{password1}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+
+
+### 어드민 유저 로그인 (로그인 요청시 억세스토큰, 리플레시토큰 자동 저장 후 다른곳에서 가져다 쓸수 있습니다)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{adminUsername}}",
   "password":"{{password1}}"
 }
 
@@ -243,4 +260,35 @@ Content-Type: application/json
 
 ### 댓글 삭제
 DELETE http://localhost:8080/comments/{{postId}}
+Authorization: {{Authorization}}
+
+
+
+### 카테고리 추가
+POST http://localhost:8080/categories
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "topic": "백엔드"
+}
+
+
+### 카테고리 조회
+GET http://localhost:8080/categories
+Authorization: {{Authorization}}
+
+
+### 카테고리 수정
+PUT http://localhost:8080/categories/{{categoryId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "topic": "수정된카테고리"
+}
+
+
+### 카데고리 삭제
+DELETE http://localhost:8080/categories/{{categoryId}}
 Authorization: {{Authorization}}

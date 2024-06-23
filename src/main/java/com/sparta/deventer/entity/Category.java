@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "categories")
-public class Category {
+public class Category extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +25,10 @@ public class Category {
 
     //테스트용
     public Category(String topic) {
+        this.topic = topic;
+    }
+
+    public void updateTopic(String topic) {
         this.topic = topic;
     }
 }
