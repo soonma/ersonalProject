@@ -8,4 +8,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByTopic(String categoryTopic);
 
+    boolean existsByTopic(String topic);
 }

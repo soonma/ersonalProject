@@ -1,15 +1,21 @@
 package com.sparta.deventer.service;
 
 import com.sparta.deventer.dto.ChangePasswordRequestDto;
+import com.sparta.deventer.dto.CommentResponseDto;
+import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.dto.ProfileResponseDto;
 import com.sparta.deventer.dto.UpdateProfileRequestDto;
 import com.sparta.deventer.entity.PasswordHistory;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.exception.InvalidPasswordException;
+import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PasswordHistoryRepository;
+import com.sparta.deventer.repository.PostRepository;
 import com.sparta.deventer.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +24,24 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     public ProfileResponseDto getProfile(Long userId, User user) {
         user.validateId(userId);
         return new ProfileResponseDto(user);
+    }
+
+    public Page<PostResponseDto> getAllPosts(Long userId, User user, Pageable pageable) {
+        user.validateId(userId);
+        return postRepository.findByUserId(userId, pageable).map(PostResponseDto::new);
+    }
+
+    public Page<CommentResponseDto> getAllComments(Long userId, User user, Pageable pageable) {
+        user.validateId(userId);
+        return commentRepository.findByUserId(userId, pageable).map(CommentResponseDto::new);
     }
 
     public ProfileResponseDto updateProfile(Long userId,
@@ -54,7 +72,7 @@ public class UserService {
         PasswordHistory newHistory = new PasswordHistory(passwordEncoder.encode(newPassword), user);
         passwordHistoryRepository.save(newHistory);
 
-        if (passwordHistoryList.size() > 3) {
+        if (passwordHistoryList.size() > 2) {
             passwordHistoryRepository.delete(passwordHistoryList.get(0));
         }
 
