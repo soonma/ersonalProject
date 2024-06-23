@@ -5,7 +5,6 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.repository.CommentRepository;
-import com.sparta.deventer.repository.UserRepository;
 import com.sparta.deventer.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class AdminCommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
 
     public CommentResponseDto updateComment(UserDetailsImpl userDetails,
             CommentRequestDto requestDto, Long commentId) {
@@ -29,6 +27,11 @@ public class AdminCommentService {
     }
 
     public void deleteComment(UserDetailsImpl userDetails, Long commentId) {
+        checkAdminUser(userDetails.getUser().getRole());
+
+        Comment comment = emptyCheckComment(commentId);
+
+        commentRepository.delete(comment);
     }
 
 
