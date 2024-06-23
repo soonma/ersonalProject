@@ -37,21 +37,21 @@ public class CommentController {
         return ResponseEntity.ok().body(commentResponseDto);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDto requestDto,
-            @PathVariable Long postId) {
+            @PathVariable Long commentId) {
         return ResponseEntity.ok()
                 .body(commentService.updateComment(userDetails.getUser().getId(), requestDto,
-                        postId));
+                        commentId));
     }
 
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{commentId}")
     public String deleteComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long postId) {
-        commentService.deleteComment(userDetails.getUser().getId(), postId);
+            @PathVariable Long commentId) {
+        commentService.deleteComment(userDetails.getUser().getId(), commentId);
         return "삭제가 완료 되었습니다.";
     }
 }

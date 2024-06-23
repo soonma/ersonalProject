@@ -22,7 +22,7 @@ public class CommentService {
 
     public CommentResponseDto createComment(CommentRequestDto requestDto, User user) {
 
-        Post post = validPostId(requestDto.getPostId());
+        Post post = checkEmptyPost(requestDto.getPostId());
 
         Comment comment = new Comment(post, user, requestDto.getContent());
 
@@ -35,37 +35,37 @@ public class CommentService {
 
     @Transactional
     public CommentResponseDto updateComment(Long userId, CommentRequestDto requestDto,
-            Long postId) {
-        Comment comment = validCommentId(postId);
+            Long commentId) {
+        Comment comment = emptyCheckComment(commentId);
 
-        validUserId(comment, userId);
+        checkEqualsUser(comment, userId);
 
         comment.update(requestDto.getContent());
 
         return new CommentResponseDto(comment);
     }
 
-    public void deleteComment(Long userId, Long postId) {
-        Comment comment = validCommentId(postId);
+    public void deleteComment(Long userId, Long commentId) {
+        Comment comment = emptyCheckComment(commentId);
 
-        validUserId(comment, userId);
+        checkEqualsUser(comment, userId);
 
         commentRepository.delete(comment);
     }
 
 
-    public Comment validCommentId(Long Id) {
-        return commentRepository.findById(Id)
+    public Comment emptyCheckComment(Long commentId) {
+        return commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을수 없습니다"));
     }
 
-    public void validUserId(Comment comment, Long userId) {
+    public void checkEqualsUser(Comment comment, Long userId) {
         if (!comment.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
     }
 
-    public Post validPostId(Long postId) {
+    public Post checkEmptyPost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재 하지 않습니다."));
     }
