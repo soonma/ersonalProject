@@ -27,4 +27,8 @@ public class Category extends Timestamped {
     public Category(String topic) {
         this.topic = topic;
     }
+
+    public void updateTopic(String topic) {
+        this.topic = topic;
+    }
 }

@@ -4,10 +4,12 @@ import com.sparta.deventer.controller.CategoryResponseDto;
 import com.sparta.deventer.dto.CategoryRequestDto;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.exception.CategoryDuplicateException;
+import com.sparta.deventer.exception.CategoryNotFoundException;
 import com.sparta.deventer.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +27,10 @@ public class CategoryService {
 
         categoryRepository.save(category);
 
-        return new CategoryResponseDto(
-                category.getId(),
-                category.getTopic(),
-                category.getCreatedAt(),
-                category.getUpdateAt()
-        );
+        return makeResponseDto(category);
     }
 
+    @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAllCategory() {
         return categoryRepository.findAll().stream()
                 .map(category -> new CategoryResponseDto(
@@ -41,5 +39,28 @@ public class CategoryService {
                         category.getCreatedAt(),
                         category.getUpdateAt()))
                 .toList();
+    }
+
+    @Transactional
+    public CategoryResponseDto changeCategory(Long categoryId, CategoryRequestDto requestDto) {
+        Category category = getCategoryById(categoryId);
+
+        category.updateTopic(requestDto.getTopic());
+
+        return makeResponseDto(category);
+    }
+
+    private Category getCategoryById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾지 못했습니다."));
+    }
+
+    private CategoryResponseDto makeResponseDto(Category category) {
+        return new CategoryResponseDto(
+                category.getId(),
+                category.getTopic(),
+                category.getCreatedAt(),
+                category.getUpdateAt()
+        );
     }
 }

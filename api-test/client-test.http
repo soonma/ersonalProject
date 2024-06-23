@@ -23,6 +23,8 @@
 
 @postId = 1
 
+@categoryId = 1
+
 @admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT09
 
 # 일반권한인 유저 테스트입니다.
@@ -275,3 +277,13 @@ Content-Type: application/json
 ### 카테고리 조회
 GET http://localhost:8080/categories
 Authorization: {{Authorization}}
+
+
+### 카테고리 수정
+PUT http://localhost:8080/categories/{{categoryId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "topic": "수정된카테고리"
+}
