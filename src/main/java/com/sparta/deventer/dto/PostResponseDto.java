@@ -3,12 +3,12 @@ package com.sparta.deventer.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.deventer.entity.Post;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Getter
 public class PostResponseDto {
+
     private String nickname;
     private String categoryTopic;
     private String title;

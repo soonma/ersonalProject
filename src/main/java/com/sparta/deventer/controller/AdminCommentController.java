@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/admin/comments")
 @RequiredArgsConstructor
-public class AdminComment {
+public class AdminCommentController {
 
     private final AdminCommentService adminCommentService;
 
