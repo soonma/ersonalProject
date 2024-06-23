@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/sign-up/admin").permitAll()
                         .requestMatchers("/categories/**")
                         .hasAnyAuthority(UserRole.ADMIN.getAuthority())
+                        .requestMatchers(HttpMethod.GET, "/categories")
+                        .hasAnyAuthority(UserRole.ADMIN.getAuthority())
                         .requestMatchers(HttpMethod.GET)
                         .permitAll() // Post, Comment 조회기능만 통과하도록 추후 변경
                         .anyRequest().authenticated()

@@ -5,6 +5,7 @@ import com.sparta.deventer.dto.CategoryRequestDto;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.exception.CategoryDuplicateException;
 import com.sparta.deventer.repository.CategoryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,15 @@ public class CategoryService {
                 category.getCreatedAt(),
                 category.getUpdateAt()
         );
+    }
+
+    public List<CategoryResponseDto> getAllCategory() {
+        return categoryRepository.findAll().stream()
+                .map(category -> new CategoryResponseDto(
+                        category.getId(),
+                        category.getTopic(),
+                        category.getCreatedAt(),
+                        category.getUpdateAt()))
+                .toList();
     }
 }
