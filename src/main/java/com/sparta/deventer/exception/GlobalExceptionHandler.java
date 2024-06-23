@@ -32,9 +32,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<Object> handleInvalidOperationException(InvalidOperationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException e) {
+        MethodArgumentNotValidException e) {
         List<String> errorMessages = new ArrayList<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
