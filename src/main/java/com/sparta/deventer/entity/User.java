@@ -1,6 +1,7 @@
 package com.sparta.deventer.entity;
 
 import com.sparta.deventer.enums.UserRole;
+import com.sparta.deventer.enums.UserStatus;
 import com.sparta.deventer.exception.AlreadyWithdrawnException;
 import com.sparta.deventer.exception.InvalidPasswordException;
 import jakarta.persistence.Column;
@@ -51,6 +52,11 @@ public class User extends Timestamped {
     @Setter
     private String email;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private UserStatus status;
+
     private LocalDateTime deletedAt;
 
     public User(String username, String password, String nickname, UserRole role, String email) {
@@ -59,6 +65,7 @@ public class User extends Timestamped {
         this.nickname = nickname;
         this.email = email;
         this.role = role;
+        this.status = UserStatus.ACTIVE;
         this.refreshToken = null;
     }
 
@@ -79,14 +86,16 @@ public class User extends Timestamped {
     }
 
     public void softWithdrawUser() {
+        this.status = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
     }
 
     public void checkUserWithdrawn() {
-        if (this.deletedAt != null) {
-            throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
+//        if (this.deletedAt != null) {
+//            throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
+//        }
+        if (this.status == UserStatus.DELETED) {
+            throw new AlreadyWithdrawnException("이미 탈퇴한 사용자입니다.");
         }
     }
-
-
 }
