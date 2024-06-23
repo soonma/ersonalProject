@@ -61,18 +61,20 @@ public class PostService {
     }
 
     //게시글 전체 조회
-    public Page<PostResponseDto> getAllPosts(Pageable pageable) {
+    public List<PostResponseDto> getAllPosts(Pageable pageable) {
         Pageable sortedByCreatedAtDesc = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by("createdAt").descending()
         );
-        return postRepository.findAll(sortedByCreatedAtDesc)
+        Page<PostResponseDto> page = postRepository.findAll(sortedByCreatedAtDesc)
                 .map(PostResponseDto::new);
+
+        return page.getContent();
     }
 
     // 카테고리 내의 게시글 조회
-    public Page<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
+    public List<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾을 수 없습니다."));
 
@@ -81,18 +83,10 @@ public class PostService {
                 pageable.getPageSize(),
                 Sort.by("createdAt").descending()
         );
-
-        return postRepository.findAllByCategory(category, sortedByCreatedAtDesc)
+        Page<PostResponseDto> page = postRepository.findAllByCategory(category, sortedByCreatedAtDesc)
                 .map(PostResponseDto::new);
-    }
 
-    // 게시글 단일 조회
-    public PostResponseDto getPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
-
-
-        return new PostResponseDto(post);
+        return page.getContent();
     }
 
     // 게시글 수정
