@@ -1,4 +1,4 @@
-package com.sparta.deventer.controller;
+package com.sparta.deventer.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

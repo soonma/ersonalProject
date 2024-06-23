@@ -287,3 +287,8 @@ Content-Type: application/json
 {
   "topic": "수정된카테고리"
 }
+
+
+### 카데고리 삭제
+DELETE http://localhost:8080/categories/{{categoryId}}
+Authorization: {{Authorization}}
