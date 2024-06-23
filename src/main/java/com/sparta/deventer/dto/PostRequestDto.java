@@ -16,7 +16,6 @@ public class PostRequestDto {
         this.title = title;
         this.content = content;
         this.categoryTopic = categoryTopic;
-
     }
 
 

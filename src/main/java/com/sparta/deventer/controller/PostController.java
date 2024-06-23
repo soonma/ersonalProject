@@ -2,6 +2,7 @@ package com.sparta.deventer.controller;
 
 import com.sparta.deventer.dto.PostRequestDto;
 import com.sparta.deventer.dto.PostResponseDto;
+import com.sparta.deventer.dto.PostWithCommentsResponseDto;
 import com.sparta.deventer.dto.UpdatePostRequestsDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.PostService;
@@ -37,7 +38,7 @@ public class PostController {
         return ResponseEntity.ok().body(postResponseDto);
     }
     //게시글 조회
-    @GetMapping("/{postId}")
+    @GetMapping
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(
             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
