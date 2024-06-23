@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/users/{userId}")
 public class UserController {
 
     private static final int PAGE_SIZE = 5;
     private final UserService userService;
 
-    @GetMapping("/{userId}")
+    @GetMapping
     public ResponseEntity<Object> getProfile(@PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
@@ -39,7 +39,7 @@ public class UserController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
-    @GetMapping("/{userId}/posts")
+    @GetMapping("/posts")
     public ResponseEntity<Object> getAllPosts(@PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(defaultValue = "0") int page) {
@@ -50,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok(postResponseDtoPage);
     }
 
-    @GetMapping("/{userId}/comments")
+    @GetMapping("/comments")
     public ResponseEntity<Object> getAllComments(@PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(defaultValue = "0") int page) {
@@ -62,7 +62,7 @@ public class UserController {
         return ResponseEntity.ok(commentResponseDtoPage);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping
     public ResponseEntity<Object> updateProfile(@PathVariable Long userId,
         @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -73,7 +73,7 @@ public class UserController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
-    @PutMapping("/{userId}/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<Object> changePassword(@PathVariable Long userId,
         @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
