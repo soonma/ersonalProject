@@ -53,4 +53,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(CategoryNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(PostNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
 }
