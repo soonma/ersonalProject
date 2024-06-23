@@ -2,7 +2,7 @@ package com.sparta.deventer.entity;
 
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.AlreadyWithdrawnException;
-import com.sparta.deventer.exception.InvalidException;
+import com.sparta.deventer.exception.InvalidPasswordException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,7 +64,13 @@ public class User extends Timestamped {
 
     public void validatePassword(PasswordEncoder passwordEncoder, String password) {
         if (!passwordEncoder.matches(password, this.password)) {
-            throw new InvalidException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    public void validateId(Long id) {
+        if (!id.equals(this.getId())) {
+            throw new IllegalArgumentException("자신의 정보만 수정할 수 있습니다.");
         }
     }
 
@@ -81,4 +87,6 @@ public class User extends Timestamped {
             throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
         }
     }
+
+
 }

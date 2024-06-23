@@ -14,11 +14,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<Object> handleDuplicateException(DuplicateException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getErrorMessages());
     }
 
-    @ExceptionHandler(InvalidException.class)
-    public ResponseEntity<Object> handleInvalidException(InvalidException e) {
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException e) {
+            MethodArgumentNotValidException e) {
         List<String> errorMessages = new ArrayList<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(InvalidException e) {
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
     @ExceptionHandler(AlreadyWithdrawnException.class)
     public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -4,13 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserSignUpRequestDto {
 
     @NotBlank(message = "아이디는 공백일 수 없습니다.")

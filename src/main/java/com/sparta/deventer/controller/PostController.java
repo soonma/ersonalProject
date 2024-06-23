@@ -21,6 +21,12 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostWithCommentsResponseDto> getCommentList(@PathVariable Long postId) {
+        PostWithCommentsResponseDto responseDto = postService.getPostDetail(postId);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
     // 게시글 생성
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(
@@ -32,7 +38,8 @@ public class PostController {
     }
     //게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<Page<PostResponseDto>> getAllPosts(@RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<Page<PostResponseDto>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<PostResponseDto> posts = postService.getAllPosts(pageable);
         return ResponseEntity.ok(posts);
@@ -40,11 +47,12 @@ public class PostController {
     //카테고리 별 게시글 조회
     @GetMapping(params = "category")
     public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(@RequestParam Long category,
-                                                                    @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
         Page<PostResponseDto> posts = postService.getPostsByCategory(category, pageable);
         return ResponseEntity.ok(posts);
     }
+
     // 게시글 수정
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(
@@ -52,13 +60,15 @@ public class PostController {
             @RequestBody UpdatePostRequestsDto updatePostRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        PostResponseDto postResponseDto = postService.updatePost(postId, updatePostRequestDto, userDetails.getUser());
+        PostResponseDto postResponseDto = postService.updatePost(postId, updatePostRequestDto,
+                userDetails.getUser());
         return new ResponseEntity<>(postResponseDto, HttpStatus.OK);
     }
+
     //게시글 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId,
-                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         postService.deletePost(postId, userDetails.getUser());
         return new ResponseEntity<>("게시글이 삭제 되었습니다.", HttpStatus.OK);
     }
