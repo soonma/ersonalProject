@@ -1,18 +1,13 @@
 package com.sparta.deventer.dto;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class PostWithCommentsResponseDto {
 
-    private PostResponseDto responseDto;
-
-    private List<CommentResponseDto> commentList;
-
-    public PostWithCommentsResponseDto(PostResponseDto responseDto,
-            List<CommentResponseDto> commentList) {
-        this.responseDto = responseDto;
-        this.commentList = commentList;
-    }
+    private final PostResponseDto postResponseDto;
+    private final List<CommentResponseDto> commentResponseDtoList;
 }

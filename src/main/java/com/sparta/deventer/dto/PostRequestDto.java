@@ -4,13 +4,9 @@ import lombok.Getter;
 @Getter
 public class PostRequestDto {
 
-    private String title;
-    private String content;
-    private String categoryTopic;
-
-
-
-
+    private final String title;
+    private final String content;
+    private final String categoryTopic;
 
     public PostRequestDto(String title, String content, String categoryTopic) {
         this.title = title;

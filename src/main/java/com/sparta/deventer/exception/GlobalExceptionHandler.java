@@ -27,9 +27,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+    @ExceptionHandler(AlreadyWithdrawnException.class)
+    public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException e) {
+        MethodArgumentNotValidException e) {
         List<String> errorMessages = new ArrayList<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
@@ -49,16 +54,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(AlreadyWithdrawnException.class)
-    public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(CategoryNotFoundException e) {
+    public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(PostNotFoundException e) {
+    public ResponseEntity<Object> handlePostNotFoundException(PostNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }
