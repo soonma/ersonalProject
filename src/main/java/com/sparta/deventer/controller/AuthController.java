@@ -1,8 +1,7 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.dto.AdminSignUpRequestDto;
 import com.sparta.deventer.dto.LoginRequestDto;
-import com.sparta.deventer.dto.UserSignUpRequestDto;
+import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +28,7 @@ public class AuthController {
      * @return 회원가입 완료 메세지
      */
     @PostMapping("/auth/sign-up")
-    public ResponseEntity<String> userSignUp(@Valid @RequestBody UserSignUpRequestDto requestDto) {
+    public ResponseEntity<String> userSignUp(@Valid @RequestBody SignUpRequestDto requestDto) {
         return ResponseEntity.ok().body(authService.userSignUp(requestDto));
     }
 
@@ -79,17 +78,5 @@ public class AuthController {
     @DeleteMapping("/auth/withdraw")
     public ResponseEntity<String> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(authService.withdraw(userDetails.getUser().getId()));
-    }
-
-    /**
-     * 관리자 권한 회원가입 기능
-     *
-     * @param requestDto 관리자 회원가입 Request
-     * @return 회원가입 완료 메세지
-     */
-    @PostMapping("/auth/sign-up/admin")
-    public ResponseEntity<String> AdminSignUp(
-            @Valid @RequestBody AdminSignUpRequestDto requestDto) {
-        return ResponseEntity.ok().body(authService.adminSignUp(requestDto));
     }
 }

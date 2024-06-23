@@ -1,8 +1,7 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.AdminSignUpRequestDto;
 import com.sparta.deventer.dto.LoginRequestDto;
-import com.sparta.deventer.dto.UserSignUpRequestDto;
+import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.DuplicateException;
@@ -42,45 +41,37 @@ public class AuthService {
     private String adminCode;
 
     /**
-     * 일반 유저 로그인 로직
+     * 유저 로그인 로직
      *
      * @param requestDto 일반유저 회원가입 Request
      * @return 완료 메세지
      */
-    public String userSignUp(UserSignUpRequestDto requestDto) {
+    public String userSignUp(SignUpRequestDto requestDto) {
 
         checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
                 requestDto.getEmail());
 
-        User user = createUser(requestDto.getUsername(), requestDto.getPassword(),
-                requestDto.getNickname(), UserRole.USER, requestDto.getEmail());
+        UserRole role = UserRole.USER;
+
+        if (requestDto.isAdminStatus()) {
+            if (Objects.equals(adminCode, requestDto.getAdminCode())) {
+                role = UserRole.ADMIN;
+            } else {
+                throw new InvalidAdminCodeException("관리자 키가 일치하지 않습니다.");
+            }
+        }
+
+        User user = new User(
+                requestDto.getUsername(),
+                passwordEncoder.encode(requestDto.getPassword()),
+                requestDto.getNickname(),
+                role,
+                requestDto.getEmail()
+        );
 
         userRepository.save(user);
 
         return "회원가입이 완료되었습니다.";
-    }
-
-    /**
-     * 관리자 로그인 로직
-     *
-     * @param requestDto 관리자 회원가입 Request
-     * @return 완료 메세지
-     */
-    public String adminSignUp(AdminSignUpRequestDto requestDto) {
-
-        if (!Objects.equals(requestDto.getAdminCode(), adminCode)) {
-            throw new InvalidAdminCodeException("관리자 키가 일치하지 않습니다.");
-        }
-
-        checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
-                requestDto.getEmail());
-
-        User user = createUser(requestDto.getUsername(), requestDto.getPassword(),
-                requestDto.getNickname(), UserRole.ADMIN, requestDto.getEmail());
-
-        userRepository.save(user);
-
-        return "관리자 권한으로 회원가입 되었습니다.";
     }
 
     /**
@@ -196,27 +187,6 @@ public class AuthService {
     }
 
     /**
-     * 유저 객체 생성 로직
-     *
-     * @param username 유저 로그인 ID
-     * @param password 유저 비밀번호
-     * @param nickname 유저 닉네임
-     * @param role     유저 권한
-     * @param email    유저 이메일
-     * @return 유저 객체
-     */
-    private User createUser(String username, String password, String nickname, UserRole role,
-            String email) {
-        return new User(
-                username,
-                passwordEncoder.encode(password),
-                nickname,
-                role,
-                email
-        );
-    }
-
-    /**
      * 유저 객체 유저 로그인 ID로 찾아오기
      *
      * @param username 유저 로그인 ID
@@ -259,8 +229,8 @@ public class AuthService {
     /**
      * 토큰 비교로직
      *
-     * @param user         리플레시토큰을 가지고 있는 유저객체
-     * @param refreshToken 비교할 리플레시토큰
+     * @param userRefreshToken 저장되어있는 리플레시토큰
+     * @param refreshToken     비교할 리플레시토큰
      */
     private void validateRefreshToken(String userRefreshToken, String refreshToken) {
         if (!Objects.equals(userRefreshToken, refreshToken)) {

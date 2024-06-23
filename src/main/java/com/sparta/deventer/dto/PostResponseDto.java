@@ -1,22 +1,32 @@
 package com.sparta.deventer.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.deventer.entity.Post;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class PostResponseDto {
-    private Long postid;
+    private String nickname;
+    private String categoryTopic;
     private String title;
     private String content;
-    private String categoryTopic;
+    private LocalDateTime createAt;
+    private LocalDateTime updateAt;
+
+    @JsonIgnore
+    private boolean someFieldToIgnore;
 
 
     public PostResponseDto(Post post) {
-        this.postid = post.getId();
+        this.nickname = post.getUser().getNickname();
+        this.categoryTopic = post.getCategory().getTopic();
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.categoryTopic = post.getCategory().getTopic();
+        this.createAt = post.getCreatedAt();
+        this.updateAt = post.getUpdateAt();
     }
 
 }

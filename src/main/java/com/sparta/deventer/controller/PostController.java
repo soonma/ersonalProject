@@ -7,21 +7,14 @@ import com.sparta.deventer.dto.UpdatePostRequestsDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
@@ -38,29 +31,30 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping
-    public ResponseEntity<String> createPost(
+    public ResponseEntity<PostResponseDto> createPost(
             @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        postService.createPost(postRequestDto, userDetails.getUser());
-        return new ResponseEntity<>("게시글이 성공적으로 작성되었습니다.", HttpStatus.CREATED);
+        PostResponseDto postResponseDto =  postService.createPost(postRequestDto, userDetails.getUser());
+        return ResponseEntity.ok().body(postResponseDto);
     }
-
     @GetMapping
-    public ResponseEntity<Page<PostResponseDto>> getAllPosts(
+    public ResponseEntity<List<PostResponseDto>> getAllPosts(
             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
-        Page<PostResponseDto> posts = postService.getAllPosts(pageable);
+        List<PostResponseDto> posts = postService.getAllPosts(pageable);
+        return ResponseEntity.ok(posts);
+    }
+    //카테고리 별 게시글 조회
+    @GetMapping(params = "category")
+    public ResponseEntity<List<PostResponseDto>> getPostsByCategory(
+            @RequestParam Long category,
+            @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        List<PostResponseDto> posts = postService.getPostsByCategory(category,pageable);
         return ResponseEntity.ok(posts);
     }
 
-    @GetMapping(params = "category")
-    public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(@RequestParam Long category,
-            @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<PostResponseDto> posts = postService.getPostsByCategory(category, pageable);
-        return ResponseEntity.ok(posts);
-    }
 
     // 게시글 수정
     @PutMapping("/{postId}")

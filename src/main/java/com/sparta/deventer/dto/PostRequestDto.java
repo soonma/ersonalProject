@@ -6,12 +6,16 @@ public class PostRequestDto {
 
     private String title;
     private String content;
-    private Long categoryId;
+    private String categoryTopic;
 
-    public PostRequestDto(String title, String content, Long categoryId) {
+
+
+
+
+    public PostRequestDto(String title, String content, String categoryTopic) {
         this.title = title;
         this.content = content;
-        this.categoryId = categoryId;
+        this.categoryTopic = categoryTopic;
     }
 
 
