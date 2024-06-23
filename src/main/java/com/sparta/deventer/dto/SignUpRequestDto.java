@@ -2,12 +2,13 @@ package com.sparta.deventer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class AdminSignUpRequestDto {
+public class SignUpRequestDto {
 
     @NotBlank(message = "아이디는 공백일 수 없습니다.")
     @Size(min = 4, max = 10, message = "아이디는 4자이상 10자 이하여야합니다.")
@@ -27,6 +28,8 @@ public class AdminSignUpRequestDto {
     @Email(message = "이메일 형식만 가능합니다.")
     private String email;
 
-    @NotBlank(message = "관리자 등록 번호는 공백일 수 없습니다.")
+    @NotNull(message = "")
+    private boolean adminStatus;
+
     private String adminCode;
 }
