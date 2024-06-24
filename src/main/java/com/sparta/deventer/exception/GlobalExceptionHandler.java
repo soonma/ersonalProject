@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(GitHubTokenException.class)
+    public ResponseEntity<Object> handleGitHubTokenException(GitHubTokenException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
     @ExceptionHandler(CategoryDuplicateException.class)
     public ResponseEntity<Object> handleCategoryDuplicateException(CategoryDuplicateException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -35,6 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e) {
+
         List<String> errorMessages = new ArrayList<>();
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
@@ -49,23 +55,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    }
-
     @ExceptionHandler(AlreadyWithdrawnException.class)
     public ResponseEntity<Object> handelAlreadyWithdrawnException(AlreadyWithdrawnException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(CategoryNotFoundException e) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(PostNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @ExceptionHandler(NotAdminException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(NotAdminException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

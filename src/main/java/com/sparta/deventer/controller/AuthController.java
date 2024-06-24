@@ -11,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,6 +45,19 @@ public class AuthController {
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDto requestDto,
             HttpServletResponse response) {
         return ResponseEntity.ok().body(authService.login(requestDto, response));
+    }
+
+    /**
+     * 깃허브 소셜 로그인
+     *
+     * @param code     사용자가 깃허브로부터 받은 인증코드
+     * @param response 사용자에게 우리 서비스의 억세스와, 리플레시토큰을 반환해줄 Response
+     * @return 성공 메세지
+     */
+    @GetMapping("/github/callback")
+    public String githubCallback(@RequestParam("code") String code, HttpServletResponse response) {
+        authService.processGitHubCallback(code, response);
+        return "회원가입 및 로그인 성공";
     }
 
     /**

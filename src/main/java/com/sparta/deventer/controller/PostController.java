@@ -6,10 +6,7 @@ import com.sparta.deventer.dto.PostWithCommentsResponseDto;
 import com.sparta.deventer.dto.UpdatePostRequestsDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.PostService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 
-    private static final Logger log = LoggerFactory.getLogger(PostController.class);
+    private static final int PAGE_SIZE = 5;
     private final PostService postService;
 
     @GetMapping("/{postId}")
@@ -46,10 +45,11 @@ public class PostController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = postService.createPost(postRequestDto,
-                userDetails.getUser());
-        return ResponseEntity.ok().body(postResponseDto);
+            userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
     }
 
+    // 전체 게시물 조회
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> getAllPosts(
             @RequestParam(defaultValue = "0") int page) {
@@ -57,35 +57,34 @@ public class PostController {
         List<PostResponseDto> posts = postService.getAllPosts(pageable);
         return ResponseEntity.ok(posts);
     }
-
-    //카테고리 별 게시글 조회
+    //카테고리 별 게시물 조회
     @GetMapping(params = "category")
     public ResponseEntity<List<PostResponseDto>> getPostsByCategory(
             @RequestParam Long category,
             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 5);
-        List<PostResponseDto> posts = postService.getPostsByCategory(category, pageable);
+        List<PostResponseDto> posts = postService.getPostsByCategory(category,pageable);
         return ResponseEntity.ok(posts);
     }
 
-
-    // 게시글 수정
+    // 게시물 수정
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(
-            @PathVariable Long postId,
-            @RequestBody UpdatePostRequestsDto updatePostRequestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        @PathVariable Long postId,
+        @RequestBody UpdatePostRequestDto updatePostRequestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = postService.updatePost(postId, updatePostRequestDto,
-                userDetails.getUser());
-        return new ResponseEntity<>(postResponseDto, HttpStatus.OK);
+            userDetails.getUser());
+        return ResponseEntity.ok(postResponseDto);
     }
 
-    //게시글 삭제
+    // 게시물 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable Long postId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         postService.deletePost(postId, userDetails.getUser());
-        return new ResponseEntity<>("게시글이 삭제 되었습니다.", HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 }
