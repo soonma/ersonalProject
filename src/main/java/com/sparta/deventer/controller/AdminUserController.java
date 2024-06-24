@@ -1,5 +1,6 @@
 package com.sparta.deventer.controller;
 
+import com.sparta.deventer.dto.ChangeNicknameRequestDto;
 import com.sparta.deventer.dto.UserResponseDto;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.service.AdminUserService;
@@ -40,9 +41,10 @@ public class AdminUserController {
     // (관리자) 사용자 닉네임 수정
     @PutMapping("/{userId}/nickname")
     public ResponseEntity<UserResponseDto> updateUserNickname(@PathVariable Long userId,
-        @RequestBody String newNickname) {
+        @RequestBody ChangeNicknameRequestDto changeNicknameRequestDto) {
 
-        UserResponseDto userResponseDto = adminUserService.updateUserNickname(userId, newNickname);
+        UserResponseDto userResponseDto = adminUserService.updateUserNickname(userId,
+            changeNicknameRequestDto);
         return ResponseEntity.ok(userResponseDto);
     }
 

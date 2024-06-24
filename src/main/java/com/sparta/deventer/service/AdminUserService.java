@@ -1,5 +1,6 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.ChangeNicknameRequestDto;
 import com.sparta.deventer.dto.UserResponseDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.NotFoundEntity;
@@ -30,9 +31,13 @@ public class AdminUserService {
         return new UserResponseDto(user);
     }
 
-    public UserResponseDto updateUserNickname(Long userId, String newNickname) {
+    public UserResponseDto updateUserNickname(Long userId,
+        ChangeNicknameRequestDto changeNicknameRequestDto) {
+
         User user = findUserById(userId);
         validateNotAdmin(user);
+
+        String newNickname = changeNicknameRequestDto.getNewNickname();
         user.setNickname(newNickname);
         userRepository.save(user);
         return new UserResponseDto(user);
