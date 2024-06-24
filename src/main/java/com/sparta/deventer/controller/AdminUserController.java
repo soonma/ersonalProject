@@ -58,7 +58,7 @@ public class AdminUserController {
 
     // (관리자) 사용자 활성화
     @PutMapping("/{userId}/activate")
-    public ResponseEntity<?> activateUser(@PathVariable Long userId) {
+    public ResponseEntity<UserResponseDto> activateUser(@PathVariable Long userId) {
 
         UserResponseDto userResponseDto = adminUserService.activateUser(userId);
         return ResponseEntity.ok(userResponseDto);
@@ -66,7 +66,7 @@ public class AdminUserController {
 
     // (관리자) 사용자 삭제
     @PutMapping("/{userId}/delete")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long userId) {
 
         UserResponseDto userResponseDto = adminUserService.deleteUser(userId);
         return ResponseEntity.ok(userResponseDto);
