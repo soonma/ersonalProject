@@ -3,11 +3,12 @@ package com.sparta.deventer.service;
 import com.sparta.deventer.dto.LoginRequestDto;
 import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.entity.User;
+import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.DuplicateException;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.exception.InvalidAdminCodeException;
 import com.sparta.deventer.exception.InvalidTokenException;
-import com.sparta.deventer.exception.UserNotFoundException;
 import com.sparta.deventer.jwt.JwtProvider;
 import com.sparta.deventer.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ public class AuthService {
     public String userSignUp(SignUpRequestDto requestDto) {
 
         checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
-                requestDto.getEmail());
+            requestDto.getEmail());
 
         UserRole role = UserRole.USER;
 
@@ -62,11 +63,11 @@ public class AuthService {
         }
 
         User user = new User(
-                requestDto.getUsername(),
-                passwordEncoder.encode(requestDto.getPassword()),
-                requestDto.getNickname(),
-                role,
-                requestDto.getEmail()
+            requestDto.getUsername(),
+            passwordEncoder.encode(requestDto.getPassword()),
+            requestDto.getNickname(),
+            role,
+            requestDto.getEmail()
         );
 
         userRepository.save(user);
@@ -92,8 +93,8 @@ public class AuthService {
 
         // 인증 매니저를 통해서 아이디, 비번을 통해 인증 진행하고 Security Context 에 저장
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.getUsername(),
-                        requestDto.getPassword()));
+            new UsernamePasswordAuthenticationToken(requestDto.getUsername(),
+                requestDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -194,7 +195,7 @@ public class AuthService {
      */
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 존재하지 않습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
     }
 
     /**
@@ -205,7 +206,7 @@ public class AuthService {
      */
     private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("해당 사용자는 존재하지 않습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
     }
 
     /**
@@ -216,7 +217,7 @@ public class AuthService {
      */
     private void tokenIssuanceAndSave(HttpServletResponse response, User user) {
         String accessToken = jwtProvider.createAccessToken(user.getUsername(),
-                user.getRole());
+            user.getRole());
         String refreshToken = jwtProvider.createRefreshToken(user.getUsername());
 
         user.saveRefreshToken(refreshToken);

@@ -1,17 +1,12 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.CommentResponseDto;
-import com.sparta.deventer.dto.PostRequestDto;
-import com.sparta.deventer.dto.PostResponseDto;
-import com.sparta.deventer.dto.PostWithCommentsResponseDto;
-import com.sparta.deventer.dto.UpdatePostRequestsDto;
+import com.sparta.deventer.dto.*;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
-import com.sparta.deventer.exception.CategoryNotFoundException;
-import com.sparta.deventer.exception.PostNotFoundException;
-import com.sparta.deventer.exception.UserNotFoundException;
+import com.sparta.deventer.enums.NotFoundEntity;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.repository.CategoryRepository;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PostRepository;
@@ -37,7 +32,7 @@ public class PostService {
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
 
         PostResponseDto postResponseDto = new PostResponseDto(post);
 
@@ -46,61 +41,65 @@ public class PostService {
             commentResponseDtoList.add(commentResponseDto);
         }
         PostWithCommentsResponseDto responseDto = new PostWithCommentsResponseDto(postResponseDto,
-                commentResponseDtoList);
+            commentResponseDtoList);
         return responseDto;
     }
 
-    // 게시글 생성
+    // 게시물 생성
     public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
         Category category = categoryRepository.findByTopic(postRequestDto.getCategoryTopic())
-                .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
 
-        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), user, category);
+        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), user,
+            category);
         postRepository.save(post);
         return new PostResponseDto(post);
     }
 
-    //게시글 전체 조회
+    //게시물 전체 조회
     public List<PostResponseDto> getAllPosts(Pageable pageable) {
         Pageable sortedByCreatedAtDesc = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by("createdAt").descending()
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by("createdAt").descending()
         );
         Page<PostResponseDto> page = postRepository.findAll(sortedByCreatedAtDesc)
-                .map(PostResponseDto::new);
+            .map(PostResponseDto::new);
 
         return page.getContent();
     }
 
-    // 카테고리 내의 게시글 조회
+    // 특정 카테고리 내의 모든 게시물 조회
     public List<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
 
         Pageable sortedByCreatedAtDesc = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by("createdAt").descending()
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by("createdAt").descending()
         );
-        Page<PostResponseDto> page = postRepository.findAllByCategory(category, sortedByCreatedAtDesc)
-                .map(PostResponseDto::new);
+        Page<PostResponseDto> page = postRepository.findAllByCategory(category,
+                sortedByCreatedAtDesc)
+            .map(PostResponseDto::new);
 
         return page.getContent();
     }
 
     // 게시글 수정
-    public PostResponseDto updatePost(Long postId, UpdatePostRequestsDto updatePostRequestsDto, User user) {
+    public PostResponseDto updatePost(Long postId, UpdatePostRequestDto updatePostRequestsDto,
+                                      User user) {
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
 
         if (!post.getUser().getId().equals(user.getId())) {
-            throw new UserNotFoundException("작성자만 수정할 수 있습니다.");
+            throw new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND);
         }
 
         post.update(
-                updatePostRequestsDto.getTitle(),
-                updatePostRequestsDto.getContent());
+            updatePostRequestsDto.getTitle(),
+            updatePostRequestsDto.getContent());
 
         postRepository.save(post);
         return new PostResponseDto(post);
@@ -109,10 +108,10 @@ public class PostService {
     //게시글 삭제
     public void deletePost(Long postId, User user) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
 
         if (!post.getUser().getId().equals(user.getId())) {
-            throw new UserNotFoundException("작성자만 삭제할 수 있습니다.");
+            throw new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND);
         }
 
         postRepository.delete(post);

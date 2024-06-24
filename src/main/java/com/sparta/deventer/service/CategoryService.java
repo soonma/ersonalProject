@@ -3,8 +3,9 @@ package com.sparta.deventer.service;
 import com.sparta.deventer.dto.CategoryRequestDto;
 import com.sparta.deventer.dto.CategoryResponseDto;
 import com.sparta.deventer.entity.Category;
+import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.exception.CategoryDuplicateException;
-import com.sparta.deventer.exception.CategoryNotFoundException;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,12 +45,12 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAllCategory() {
         return categoryRepository.findAll().stream()
-                .map(category -> new CategoryResponseDto(
-                        category.getId(),
-                        category.getTopic(),
-                        category.getCreatedAt(),
-                        category.getUpdateAt()))
-                .toList();
+            .map(category -> new CategoryResponseDto(
+                category.getId(),
+                category.getTopic(),
+                category.getCreatedAt(),
+                category.getUpdateAt()))
+            .toList();
     }
 
     /**
@@ -92,7 +93,7 @@ public class CategoryService {
      */
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾지 못했습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
     }
 
     /**
@@ -103,10 +104,10 @@ public class CategoryService {
      */
     private CategoryResponseDto makeResponseDto(Category category) {
         return new CategoryResponseDto(
-                category.getId(),
-                category.getTopic(),
-                category.getCreatedAt(),
-                category.getUpdateAt()
+            category.getId(),
+            category.getTopic(),
+            category.getCreatedAt(),
+            category.getUpdateAt()
         );
     }
 }
