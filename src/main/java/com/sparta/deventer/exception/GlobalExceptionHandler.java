@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(GitHubTokenException.class)
+    public ResponseEntity<Object> handleGitHubTokenException(GitHubTokenException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
     @ExceptionHandler(CategoryDuplicateException.class)
     public ResponseEntity<Object> handleCategoryDuplicateException(CategoryDuplicateException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -34,7 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException e) {
+            MethodArgumentNotValidException e) {
 
         List<String> errorMessages = new ArrayList<>();
 
@@ -59,6 +64,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
     @ExceptionHandler(NotAdminException.class)
     public ResponseEntity<Object> handleEntityNotFoundException(NotAdminException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

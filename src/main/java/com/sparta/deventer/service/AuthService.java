@@ -1,5 +1,7 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.GitHubTokenResponseDto;
+import com.sparta.deventer.dto.GitHubUserDto;
 import com.sparta.deventer.dto.LoginRequestDto;
 import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.entity.User;
@@ -7,6 +9,7 @@ import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.DuplicateException;
 import com.sparta.deventer.exception.EntityNotFoundException;
+import com.sparta.deventer.exception.GitHubTokenException;
 import com.sparta.deventer.exception.InvalidAdminCodeException;
 import com.sparta.deventer.exception.InvalidTokenException;
 import com.sparta.deventer.jwt.JwtProvider;
@@ -14,10 +17,17 @@ import com.sparta.deventer.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +35,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +46,22 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * 관리자 가입용 인증키
      */
     @Value("${admin.code}")
     private String adminCode;
+
+    @Value("${github.client.id}")
+    private String clientId;
+
+    @Value("${github.client.secret}")
+    private String clientSecret;
+
+    @Value("${github.redirect.url}")
+    private String redirectUri;
 
     /**
      * 유저 로그인 로직
@@ -50,7 +72,7 @@ public class AuthService {
     public String userSignUp(SignUpRequestDto requestDto) {
 
         checkDuplicateUser(requestDto.getUsername(), requestDto.getNickname(),
-            requestDto.getEmail());
+                requestDto.getEmail());
 
         UserRole role = UserRole.USER;
 
@@ -63,11 +85,11 @@ public class AuthService {
         }
 
         User user = new User(
-            requestDto.getUsername(),
-            passwordEncoder.encode(requestDto.getPassword()),
-            requestDto.getNickname(),
-            role,
-            requestDto.getEmail()
+                requestDto.getUsername(),
+                passwordEncoder.encode(requestDto.getPassword()),
+                requestDto.getNickname(),
+                role,
+                requestDto.getEmail()
         );
 
         userRepository.save(user);
@@ -93,14 +115,115 @@ public class AuthService {
 
         // 인증 매니저를 통해서 아이디, 비번을 통해 인증 진행하고 Security Context 에 저장
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(requestDto.getUsername(),
-                requestDto.getPassword()));
+                new UsernamePasswordAuthenticationToken(requestDto.getUsername(),
+                        requestDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         tokenIssuanceAndSave(response, user);
 
         return "로그인 성공했습니다";
+    }
+
+    /**
+     * 깃허브 소셜로그인 로직
+     *
+     * @param code     사용자가 깃허브로부터 받은 인증 코드
+     * @param response 사용자에게 토큰을 담아줄 Response
+     */
+    @Transactional
+    public void processGitHubCallback(String code, HttpServletResponse response) {
+
+        GitHubTokenResponseDto accessToken = getAccessToken(code);
+
+        GitHubUserDto gitHubUserDto = getUserInfo(accessToken);
+
+        User user = registerOrUpdateUser(gitHubUserDto);
+
+        tokenIssuanceAndSave(response, user);
+    }
+
+    /**
+     * 사용자의 인증코드로부터 깃허브에게 억세스토큰을 발급받기
+     *
+     * @param code 사용자의 깃허브로부터 받은 인증 코드
+     * @return 억세스토큰
+     */
+    private GitHubTokenResponseDto getAccessToken(String code) {
+
+        String accessTokenUrl = UriComponentsBuilder.fromUriString(
+                        "https://github.com/login/oauth/access_token")
+                .queryParam("client_id", clientId)
+                .queryParam("client_secret", clientSecret)
+                .queryParam("code", code)
+                .queryParam("redirect_uri", redirectUri)
+                .toUriString();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<GitHubTokenResponseDto> tokenResponse = restTemplate.postForEntity(
+                accessTokenUrl, entity, GitHubTokenResponseDto.class);
+
+        if (tokenResponse.getBody() == null || tokenResponse.getBody().getAccess_token() == null) {
+            throw new GitHubTokenException("깃허브 토큰 문제가 발생했습니다.");
+        }
+
+        return tokenResponse.getBody();
+    }
+
+    /**
+     * 발급받은 억세스토큰으로 사용자의 정보를 깃허브에게 다시 요청
+     *
+     * @param responseDto 사용자의 인증코드로 발급받은 억세스토큰
+     * @return 사용자의 정보를 담은 dto
+     */
+    private GitHubUserDto getUserInfo(GitHubTokenResponseDto responseDto) {
+
+        String userInfoUrl = "https://api.github.com/user";
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.set("Authorization", "Bearer " + responseDto.getAccess_token());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<GitHubUserDto> userResponse = restTemplate.exchange(userInfoUrl,
+                HttpMethod.GET, entity, GitHubUserDto.class);
+
+        return userResponse.getBody();
+    }
+
+    /**
+     * 받아온 사용자의 정보로 회원인지 이미 가입된유저인지 확인후 가입된유저라면 기존 정보를 주고 아니라면 회원가입
+     *
+     * @param userDto 억세스토큰으로 깃허브로부터 받은 유저정보 Dto
+     * @return 우리 서비스의 유저 객체
+     */
+    private User registerOrUpdateUser(GitHubUserDto userDto) {
+
+        String username = userDto.getName();
+
+        String email = userDto.getEmail();
+
+        Optional<User> existingUser = userRepository.findByEmail(email);
+
+        if (existingUser.isPresent()) {
+            return existingUser.get();
+        } else {
+            User newUser = new User(
+                    username,
+                    passwordEncoder.encode("GITHUB_OAUTH2_USER"),
+                    username,
+                    UserRole.USER,
+                    email
+            );
+
+            return userRepository.save(newUser);
+        }
     }
 
     /**
@@ -195,7 +318,7 @@ public class AuthService {
      */
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
     }
 
     /**
@@ -206,7 +329,7 @@ public class AuthService {
      */
     private User getUserByUserId(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
     }
 
     /**
@@ -217,7 +340,7 @@ public class AuthService {
      */
     private void tokenIssuanceAndSave(HttpServletResponse response, User user) {
         String accessToken = jwtProvider.createAccessToken(user.getUsername(),
-            user.getRole());
+                user.getRole());
         String refreshToken = jwtProvider.createRefreshToken(user.getUsername());
 
         user.saveRefreshToken(refreshToken);
