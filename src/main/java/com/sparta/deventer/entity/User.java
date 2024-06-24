@@ -58,6 +58,7 @@ public class User extends Timestamped {
     @Setter
     private UserStatus status;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserLoginType loginType;
 

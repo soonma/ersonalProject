@@ -218,7 +218,9 @@ public class AuthService {
 
         String email = userDto.getEmail();
 
-        Optional<User> existingUser = userRepository.findByEmail(email);
+        UserLoginType loginType = UserLoginType.GITHUB;
+
+        Optional<User> existingUser = userRepository.findByEmailAndLoginType(email, loginType);
 
         if (existingUser.isPresent()) {
             return existingUser.get();
