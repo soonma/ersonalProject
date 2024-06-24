@@ -1,12 +1,12 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.security.UserDetailsImpl;
+import com.sparta.deventer.dto.UserResponseDto;
+import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.service.AdminUserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,36 +24,49 @@ public class AdminUserController {
 
     // (관리자) 사용자 전체 목록 조회
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return null;
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserResponseDto> users = adminUserService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     // (관리자) 사용자 권한 부여
     @PutMapping("/{userId}/role")
-    public ResponseEntity<?> updateUserRole(@PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return null;
+    public ResponseEntity<UserResponseDto> updateUserRole(@PathVariable Long userId) {
+
+        UserResponseDto userResponseDto = adminUserService.updateUserRole(userId, UserRole.ADMIN);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     // (관리자) 사용자 닉네임 수정
     @PutMapping("/{userId}/nickname")
-    public ResponseEntity<?> updateUserNickname(@PathVariable Long userId,
-        @RequestBody String newNickname,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return null;
+    public ResponseEntity<UserResponseDto> updateUserNickname(@PathVariable Long userId,
+        @RequestBody String newNickname) {
+
+        UserResponseDto userResponseDto = adminUserService.updateUserNickname(userId, newNickname);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     // (관리자) 사용자 차단
-    @PutMapping("/{userId}/status")
-    public ResponseEntity<?> blockUser(@PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return null;
+    @PutMapping("/{userId}/block")
+    public ResponseEntity<UserResponseDto> blockUser(@PathVariable Long userId) {
+
+        UserResponseDto userResponseDto = adminUserService.blockUser(userId);
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+    // (관리자) 사용자 활성화
+    @PutMapping("/{userId}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable Long userId) {
+
+        UserResponseDto userResponseDto = adminUserService.activateUser(userId);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     // (관리자) 사용자 삭제
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return null;
+    @PutMapping("/{userId}/delete")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+
+        UserResponseDto userResponseDto = adminUserService.deleteUser(userId);
+        return ResponseEntity.ok(userResponseDto);
     }
 }
