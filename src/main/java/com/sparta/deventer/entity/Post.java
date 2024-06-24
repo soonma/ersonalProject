@@ -35,9 +35,14 @@ public class Post extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Setter
+    @Column(nullable = false)
+    private boolean notice = false;
 
     public Post(String title, String content, User user, Category category) {
         this.title = title;
