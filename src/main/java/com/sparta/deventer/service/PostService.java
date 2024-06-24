@@ -1,10 +1,6 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.CommentResponseDto;
-import com.sparta.deventer.dto.PostRequestDto;
-import com.sparta.deventer.dto.PostResponseDto;
-import com.sparta.deventer.dto.PostWithCommentsResponseDto;
-import com.sparta.deventer.dto.UpdatePostRequestsDto;
+import com.sparta.deventer.dto.*;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
@@ -49,7 +45,7 @@ public class PostService {
         return responseDto;
     }
 
-    // 게시글 생성
+    // 게시물 생성
     public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
         Category category = categoryRepository.findByTopic(postRequestDto.getCategoryTopic())
             .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
@@ -60,7 +56,7 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
-    //게시글 전체 조회
+    //게시물 전체 조회
     public List<PostResponseDto> getAllPosts(Pageable pageable) {
         Pageable sortedByCreatedAtDesc = PageRequest.of(
             pageable.getPageNumber(),
@@ -73,7 +69,7 @@ public class PostService {
         return page.getContent();
     }
 
-    // 카테고리 내의 게시글 조회
+    // 특정 카테고리 내의 모든 게시물 조회
     public List<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
@@ -91,8 +87,8 @@ public class PostService {
     }
 
     // 게시글 수정
-    public PostResponseDto updatePost(Long postId, UpdatePostRequestsDto updatePostRequestsDto,
-        User user) {
+    public PostResponseDto updatePost(Long postId, UpdatePostRequestDto updatePostRequestsDto,
+                                      User user) {
 
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
