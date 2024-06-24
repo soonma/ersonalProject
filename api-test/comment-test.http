@@ -39,7 +39,13 @@ Content-Type: application/json
   "username": "{{adminUsername}}",
   "password": "{{password1}}"
 }
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+%}
 
+### 유저 로그아웃
+POST http://localhost:8080/auth/logout
+Authorization:{{Authorization}}
 
 ### 게시글 댓글 조회
 GET http://localhost:8080/posts/1

@@ -6,6 +6,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,19 +23,18 @@ public class Like extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //    @ManyToOne
-//    @JoinColumn(name="user_id", nullable = false)
-//    private User user;
-    private long userId;
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
     private long contentId;
 
     @Enumerated(EnumType.STRING)
     private ContentEnumType contentType;
 
     @Builder
-    public Like(long userId, long typeId, String type) {
-        this.userId = userId;
+    public Like(User user, long typeId, String type) {
+        this.user = user;
         this.contentType = ContentEnumType.getByType(type);
         this.contentId = typeId;
     }

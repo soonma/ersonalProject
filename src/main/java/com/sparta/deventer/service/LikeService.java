@@ -4,6 +4,7 @@ import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.ContentEnumType;
 import com.sparta.deventer.entity.Like;
 import com.sparta.deventer.entity.Post;
+import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.exception.CommentNotFoundException;
 import com.sparta.deventer.exception.EntityNotFoundException;
@@ -25,18 +26,18 @@ public class LikeService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
 
-    public Boolean likeComparison(String contentType, Long contentId, Long userId) {
+    public Boolean likeComparison(String contentType, Long contentId, User user) {
         Optional<Like> like = likeRepository.findByContentIdAndContentTypeAndUserId(contentId,
-                ContentEnumType.getByType(contentType), userId);
+                ContentEnumType.getByType(contentType), user.getId());
         log.info("{}", like.isEmpty());
 
         if (like.isEmpty()) {
-            CheckContent(contentType, contentId, userId);
-            Like saveLike = new Like(userId, contentId, contentType);
+            CheckContent(contentType, contentId, user.getId());
+            Like saveLike = new Like(user, contentId, contentType);
             likeRepository.save(saveLike);
             return true;
         } else {
-            CheckContent(contentType, contentId, userId);
+            CheckContent(contentType, contentId, user.getId());
             likeRepository.delete(like.get());
             return false;
         }
@@ -52,7 +53,7 @@ public class LikeService {
             Post post = postRepository.findById(contentId).orElseThrow(
                     () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
             if (post.getUser().getId().equals(userId)) {
-                throw new IllegalArgumentException("본인이 좋아요 할수 없습니다");
+                throw new IllegalArgumentException("본인 게시글에 좋아요 할수 없습니다");
             }
         } else {
             Comment comment = commentRepository.findById(contentId).orElseThrow(

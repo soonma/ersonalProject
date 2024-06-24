@@ -20,7 +20,7 @@ public class LikeController {
             , @RequestParam("contentType") String contentType
             , @RequestParam("contentId") Long contentId) {
         Boolean isLiked = likeService.likeComparison(contentType, contentId,
-                userDetails.getUser().getId());
+                userDetails.getUser());
         String message = isLiked ? "좋아요가 완료 되었습니다." : "좋아요가 취소 되었습니다.";
         return ResponseEntity.ok()
                 .body(message + "현재 좋아요 갯수 : " + likeService.likeCount(contentType, contentId));
