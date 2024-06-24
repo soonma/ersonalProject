@@ -4,8 +4,9 @@ import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.ContentEnumType;
 import com.sparta.deventer.entity.Like;
 import com.sparta.deventer.entity.Post;
+import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.exception.CommentNotFoundException;
-import com.sparta.deventer.exception.PostNotFoundException;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PostRepository;
@@ -49,7 +50,7 @@ public class LikeService {
     public void CheckContent(String contentType, Long contentId, Long userId) {
         if (contentType.equals(ContentEnumType.POST.getType())) {
             Post post = postRepository.findById(contentId).orElseThrow(
-                    () -> new PostNotFoundException("게시글이 존재 하지 않습니다."));
+                    () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
             if (post.getUser().getId().equals(userId)) {
                 throw new IllegalArgumentException("본인이 좋아요 할수 없습니다");
             }

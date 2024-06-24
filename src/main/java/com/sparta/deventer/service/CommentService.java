@@ -5,8 +5,9 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
+import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.exception.CommentNotFoundException;
-import com.sparta.deventer.exception.PostNotFoundException;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,7 @@ public class CommentService {
 
     public Post checkEmptyPost(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글이 존재 하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
     }
 
 }
