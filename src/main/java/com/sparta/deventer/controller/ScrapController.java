@@ -21,11 +21,11 @@ public class ScrapController {
     private final ScrapService scrapService;
 
     @PostMapping("/posts/{postsId}")
-    public ResponseEntity<String> scrapEitherOne(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable Long postsId) {
-        boolean isScarp = scrapService.scrapEitherOne(userDetails.getUser(), postsId);
-        return ResponseEntity.ok().body(isScarp ? "스크랩 했습니다." : "스크랩 취소 했습니다");
+    public ResponseEntity<String> toggleScrap(@PathVariable Long postsId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        boolean isScrapped = scrapService.toggleScrap(postsId, userDetails.getUser());
+        return ResponseEntity.ok().body(isScrapped ? "게시물을 스크랩했습니다." : "게시물의 스크랩을 취소했습니다.");
     }
 
     @GetMapping("/users/{userId}")
