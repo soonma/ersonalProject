@@ -5,9 +5,10 @@ import com.sparta.deventer.entity.ContentEnumType;
 import com.sparta.deventer.entity.Like;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
+import com.sparta.deventer.enums.MismatchStatusEntity;
 import com.sparta.deventer.enums.NotFoundEntity;
-import com.sparta.deventer.exception.CommentNotFoundException;
 import com.sparta.deventer.exception.EntityNotFoundException;
+import com.sparta.deventer.exception.MismatchStatusException;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PostRepository;
@@ -53,13 +54,13 @@ public class LikeService {
             Post post = postRepository.findById(contentId).orElseThrow(
                     () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
             if (post.getUser().getId().equals(userId)) {
-                throw new IllegalArgumentException("본인 게시글에 좋아요 할수 없습니다");
+                throw new MismatchStatusException(MismatchStatusEntity.SELF_USER);
             }
         } else {
             Comment comment = commentRepository.findById(contentId).orElseThrow(
-                    () -> new CommentNotFoundException("댓글이 존재 하지 않습니다."));
+                    () -> new EntityNotFoundException(NotFoundEntity.COMMENT_NOT_FOUND));
             if (comment.getUser().getId().equals(userId)) {
-                throw new IllegalArgumentException("본인이 좋아요 할수 없습니다");
+                throw new MismatchStatusException(MismatchStatusEntity.SELF_USER);
             }
         }
     }
