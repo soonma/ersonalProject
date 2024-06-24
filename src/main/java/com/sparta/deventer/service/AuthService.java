@@ -6,6 +6,7 @@ import com.sparta.deventer.dto.LoginRequestDto;
 import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.NotFoundEntity;
+import com.sparta.deventer.enums.UserLoginType;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.exception.GitHubTokenException;
@@ -98,7 +99,8 @@ public class AuthService {
                 passwordEncoder.encode(requestDto.getPassword()),
                 requestDto.getNickname(),
                 role,
-                requestDto.getEmail()
+                requestDto.getEmail(),
+                UserLoginType.DEFAULT
         );
 
         userRepository.save(user);
@@ -226,7 +228,8 @@ public class AuthService {
                     passwordEncoder.encode(githubPassword),
                     username,
                     UserRole.USER,
-                    email
+                    email,
+                    UserLoginType.GITHUB
             );
 
             return userRepository.save(newUser);
