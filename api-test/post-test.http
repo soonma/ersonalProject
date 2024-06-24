@@ -3,7 +3,7 @@
 @admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT0
 @password1 = Abcdef12345!
 @nickname2 = second_name
-@post_id = 5
+@post_id = 3
 @comment_id = 1
 @title = 제목
 @content = 내용테스트
@@ -109,12 +109,12 @@ Content-Type: application/json
     client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
 %}
 ### 공지글 생성
-POST http://localhost:8080/admin/posts/notice
+PUT http://localhost:8080/admin/posts/{{post_id}}/notice
 Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "title": "공지!",
+  "title": "공지",
   "content": "내용 테스트입니다.",
   "categoryTopic": "Web"
 }

@@ -16,7 +16,7 @@ public class AdminController {
     private final AdminService adminService;
 
     // 공지글 생성
-    @PostMapping("/posts/notice")
+    @PutMapping("/posts/{postId}/notice")
     public ResponseEntity<PostResponseDto> createNoticePost(
             @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

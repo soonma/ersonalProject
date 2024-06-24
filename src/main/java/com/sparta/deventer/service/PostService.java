@@ -1,10 +1,6 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.CommentResponseDto;
-import com.sparta.deventer.dto.PostRequestDto;
-import com.sparta.deventer.dto.PostResponseDto;
-import com.sparta.deventer.dto.PostWithCommentsResponseDto;
-import com.sparta.deventer.dto.UpdatePostRequestsDto;
+import com.sparta.deventer.dto.*;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
@@ -91,8 +87,8 @@ public class PostService {
     }
 
     // 게시글 수정
-    public PostResponseDto updatePost(Long postId, UpdatePostRequestsDto updatePostRequestsDto,
-        User user) {
+    public PostResponseDto updatePost(Long postId, UpdatePostRequestDto updatePostRequestsDto,
+                                      User user) {
 
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
