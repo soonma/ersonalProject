@@ -230,7 +230,7 @@ Content-Type: application/json
 {
   "title": "수정된 게시글 제목",
   "content": "수정된 게시글 내용",
-  "categoryId": 1
+  "categoryTopic": "{{categoryTopic}}"
 }
 
 
@@ -272,7 +272,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "topic": "백엔드"
+  "topic": "{{categoryTopic}}"
 }
 
 
@@ -282,7 +282,7 @@ Authorization: {{Authorization}}
 
 
 ### 카테고리 수정
-PUT http://localhost:8080/categories/{{categoryId}}
+PUT http://localhost:8080/categories/{{categoryId}}}}
 Authorization: {{Authorization}}
 Content-Type: application/json
 
