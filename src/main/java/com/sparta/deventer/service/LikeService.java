@@ -14,15 +14,12 @@ import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PostRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class LikeService {
 
-    private static final Logger log = LoggerFactory.getLogger(LikeService.class);
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
@@ -30,7 +27,6 @@ public class LikeService {
     public Boolean likeComparison(String contentType, Long contentId, User user) {
         Optional<Like> like = likeRepository.findByContentIdAndContentTypeAndUserId(contentId,
                 ContentEnumType.getByType(contentType), user.getId());
-        log.info("{}", like.isEmpty());
 
         if (like.isEmpty()) {
             CheckContent(contentType, contentId, user.getId());

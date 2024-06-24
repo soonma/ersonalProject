@@ -5,7 +5,6 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor
@@ -28,9 +26,6 @@ public class CommentController {
     public ResponseEntity<CommentResponseDto> createComment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDto requestDto) {
-
-        log.info("userDetails 정보 : {}", userDetails.getUser());
-        log.info("requestDto 정보 : {}", requestDto);
 
         CommentResponseDto commentResponseDto = commentService.createComment(requestDto,
                 userDetails.getUser());

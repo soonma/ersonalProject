@@ -34,8 +34,6 @@ public class CommentService {
 
         Comment comment = new Comment(post, user, requestDto.getContent());
 
-        log.info("Creating comment {}", comment.getUser().getUsername());
-
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
 
