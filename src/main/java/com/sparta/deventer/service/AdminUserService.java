@@ -2,10 +2,11 @@ package com.sparta.deventer.service;
 
 import com.sparta.deventer.dto.UserResponseDto;
 import com.sparta.deventer.entity.User;
+import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.enums.UserStatus;
+import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.exception.InvalidOperationException;
-import com.sparta.deventer.exception.UserNotFoundException;
 import com.sparta.deventer.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class AdminUserService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
     }
 
     private UserResponseDto updateUserStatus(User user, UserStatus status) {
