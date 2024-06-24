@@ -43,4 +43,31 @@ public class AdminService {
         postRepository.save(post);
         return new PostResponseDto(post);
     }
+
+    // 공지글 수정
+    public PostResponseDto updateNoticePost(Long postId, UpdatePostRequestDto updatePostRequestDto, User admin) {
+        checkAdmin(admin);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+
+        if (!post.isNotice()) {
+            throw new IllegalArgumentException("공지글이 아닙니다.");
+        }
+
+        post.update(updatePostRequestDto.getTitle(), updatePostRequestDto.getContent());
+        postRepository.save(post);
+        return new PostResponseDto(post);
+    }
+
+    // 어드민 권한으로 게시물 삭제
+    public void deleteUserPost(Long postId, User admin) {
+        checkAdmin(admin);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+
+        postRepository.delete(post);
+    }
+
 }
