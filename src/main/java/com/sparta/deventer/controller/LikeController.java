@@ -5,7 +5,7 @@ import com.sparta.deventer.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +15,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @PutMapping("/likes")
+    @PostMapping("/likes")
     public ResponseEntity<String> isLike(@AuthenticationPrincipal UserDetailsImpl userDetails
             , @RequestParam("contentType") String contentType
             , @RequestParam("contentId") Long contentId) {

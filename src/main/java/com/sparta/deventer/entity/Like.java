@@ -21,6 +21,9 @@ public class Like extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    //    @ManyToOne
+//    @JoinColumn(name="user_id", nullable = false)
+//    private User user;
     private long userId;
 
     private long contentId;

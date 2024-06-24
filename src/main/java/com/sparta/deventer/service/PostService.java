@@ -18,6 +18,8 @@ import com.sparta.deventer.repository.PostRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostService {
 
+    private static final Logger log = LoggerFactory.getLogger(PostService.class);
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
@@ -52,10 +55,12 @@ public class PostService {
 
     // 게시글 생성
     public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
+        log.info("카테고리 ID 정보 {}", postRequestDto.getCategoryTopic());
         Category category = categoryRepository.findByTopic(postRequestDto.getCategoryTopic())
                 .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾을 수 없습니다."));
 
-        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), user, category);
+        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), user,
+                category);
         postRepository.save(post);
         return new PostResponseDto(post);
     }
@@ -83,14 +88,16 @@ public class PostService {
                 pageable.getPageSize(),
                 Sort.by("createdAt").descending()
         );
-        Page<PostResponseDto> page = postRepository.findAllByCategory(category, sortedByCreatedAtDesc)
+        Page<PostResponseDto> page = postRepository.findAllByCategory(category,
+                        sortedByCreatedAtDesc)
                 .map(PostResponseDto::new);
 
         return page.getContent();
     }
 
     // 게시글 수정
-    public PostResponseDto updatePost(Long postId, UpdatePostRequestsDto updatePostRequestsDto, User user) {
+    public PostResponseDto updatePost(Long postId, UpdatePostRequestsDto updatePostRequestsDto,
+            User user) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
