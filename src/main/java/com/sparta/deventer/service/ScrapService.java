@@ -20,19 +20,17 @@ public class ScrapService {
     private final ScrapRepository scrapRepository;
     private final PostRepository postRepository;
 
+    public boolean toggleScrap(Long postsId, User user) {
+        Post post = postRepository.findById(postsId)
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
 
-    public boolean scrapEitherOne(User user, Long postsId) {
-        Post post = postRepository.findById(postsId).orElseThrow(
-            () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND)
-        );
-        Optional<Scrap> scrap = scrapRepository.findByUserAndPost(user, post);
-
-        if (scrap.isEmpty()) {
-            Scrap saveScrap = new Scrap(user, post);
-            scrapRepository.save(saveScrap);
+        Optional<Scrap> optionalScrap = scrapRepository.findByUserAndPost(user, post);
+        if (optionalScrap.isEmpty()) {
+            Scrap scrap = new Scrap(user, post);
+            scrapRepository.save(scrap);
             return true;
         } else {
-            scrapRepository.delete(scrap.get());
+            scrapRepository.delete(optionalScrap.get());
             return false;
         }
     }
