@@ -7,11 +7,11 @@ import com.sparta.deventer.dto.SignUpRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.NotFoundEntity;
 import com.sparta.deventer.enums.UserRole;
-import com.sparta.deventer.exception.DuplicateException;
 import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.exception.GitHubTokenException;
 import com.sparta.deventer.exception.InvalidAdminCodeException;
 import com.sparta.deventer.exception.InvalidTokenException;
+import com.sparta.deventer.exception.UserInfoDuplicateException;
 import com.sparta.deventer.jwt.JwtProvider;
 import com.sparta.deventer.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +49,7 @@ public class AuthService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     /**
-     * 관리자 가입용 인증키
+     * 환경변수 저장
      */
     @Value("${admin.code}")
     private String adminCode;
@@ -62,6 +62,15 @@ public class AuthService {
 
     @Value("${github.redirect.url}")
     private String redirectUri;
+
+    @Value("${github.token.url}")
+    private String tokenUrl;
+
+    @Value("${github.user.info.url}")
+    private String userInfoUrl;
+
+    @Value("${github.user.password}")
+    private String githubPassword;
 
     /**
      * 유저 로그인 로직
@@ -151,8 +160,7 @@ public class AuthService {
      */
     private GitHubTokenResponseDto getAccessToken(String code) {
 
-        String accessTokenUrl = UriComponentsBuilder.fromUriString(
-                        "https://github.com/login/oauth/access_token")
+        String accessTokenUrl = UriComponentsBuilder.fromUriString(tokenUrl)
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
                 .queryParam("code", code)
@@ -183,11 +191,10 @@ public class AuthService {
      */
     private GitHubUserDto getUserInfo(GitHubTokenResponseDto responseDto) {
 
-        String userInfoUrl = "https://api.github.com/user";
-
         HttpHeaders headers = new HttpHeaders();
 
-        headers.set("Authorization", "Bearer " + responseDto.getAccess_token());
+        headers.set(JwtProvider.ACCESS_HEADER,
+                JwtProvider.BEARER_PREFIX + responseDto.getAccess_token());
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -216,7 +223,7 @@ public class AuthService {
         } else {
             User newUser = new User(
                     username,
-                    passwordEncoder.encode("GITHUB_OAUTH2_USER"),
+                    passwordEncoder.encode(githubPassword),
                     username,
                     UserRole.USER,
                     email
@@ -306,7 +313,7 @@ public class AuthService {
         }
 
         if (!duplicateMessage.isEmpty()) {
-            throw new DuplicateException(duplicateMessage);
+            throw new UserInfoDuplicateException(duplicateMessage);
         }
     }
 
