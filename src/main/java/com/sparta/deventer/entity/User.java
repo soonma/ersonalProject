@@ -1,5 +1,6 @@
 package com.sparta.deventer.entity;
 
+import com.sparta.deventer.enums.UserLoginType;
 import com.sparta.deventer.enums.UserRole;
 import com.sparta.deventer.enums.UserStatus;
 import com.sparta.deventer.exception.AlreadyWithdrawnException;
@@ -57,15 +58,21 @@ public class User extends Timestamped {
     @Setter
     private UserStatus status;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserLoginType loginType;
+
     private LocalDateTime deletedAt;
 
-    public User(String username, String password, String nickname, UserRole role, String email) {
+    public User(String username, String password, String nickname, UserRole role, String email,
+            UserLoginType loginType) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.role = role;
         this.status = UserStatus.ACTIVE;
+        this.loginType = loginType;
         this.refreshToken = null;
     }
 
@@ -91,9 +98,6 @@ public class User extends Timestamped {
     }
 
     public void checkUserWithdrawn() {
-//        if (this.deletedAt != null) {
-//            throw new AlreadyWithdrawnException("이미 탈퇴한 유저입니다.");
-//        }
         if (this.status == UserStatus.DELETED) {
             throw new AlreadyWithdrawnException("이미 탈퇴한 사용자입니다.");
         }

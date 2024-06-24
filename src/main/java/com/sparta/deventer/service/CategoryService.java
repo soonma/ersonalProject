@@ -26,9 +26,7 @@ public class CategoryService {
      */
     public CategoryResponseDto createCategory(CategoryRequestDto requestDto) {
 
-        if (categoryRepository.existsByTopic(requestDto.getTopic())) {
-            throw new CategoryDuplicateException("이미 존재하는 카테고리입니다.");
-        }
+        checkDuplicateCategoryTopic(requestDto.getTopic());
 
         Category category = new Category(requestDto.getTopic());
 
@@ -45,12 +43,12 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAllCategory() {
         return categoryRepository.findAll().stream()
-            .map(category -> new CategoryResponseDto(
-                category.getId(),
-                category.getTopic(),
-                category.getCreatedAt(),
-                category.getUpdateAt()))
-            .toList();
+                .map(category -> new CategoryResponseDto(
+                        category.getId(),
+                        category.getTopic(),
+                        category.getCreatedAt(),
+                        category.getUpdateAt()))
+                .toList();
     }
 
     /**
@@ -63,6 +61,8 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDto changeCategory(Long categoryId, CategoryRequestDto requestDto) {
         Category category = getCategoryById(categoryId);
+
+        checkDuplicateCategoryTopic(requestDto.getTopic());
 
         category.updateTopic(requestDto.getTopic());
 
@@ -85,6 +85,12 @@ public class CategoryService {
         return "[" + category.getTopic() + "] 라는 카테고리가 삭제되었습니다.";
     }
 
+    private void checkDuplicateCategoryTopic(String topic) {
+        if (categoryRepository.existsByTopic(topic)) {
+            throw new CategoryDuplicateException("이미 존재하는 카테고리입니다.");
+        }
+    }
+
     /**
      * 카테고리 객체 반환 로직
      *
@@ -93,7 +99,7 @@ public class CategoryService {
      */
     private Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
     }
 
     /**
@@ -104,10 +110,10 @@ public class CategoryService {
      */
     private CategoryResponseDto makeResponseDto(Category category) {
         return new CategoryResponseDto(
-            category.getId(),
-            category.getTopic(),
-            category.getCreatedAt(),
-            category.getUpdateAt()
+                category.getId(),
+                category.getTopic(),
+                category.getCreatedAt(),
+                category.getUpdateAt()
         );
     }
 }
