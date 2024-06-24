@@ -69,5 +69,18 @@ public class AdminService {
 
         postRepository.delete(post);
     }
+    //카테고리 이동
+    public PostResponseDto moveCategory(Long postId, MoveCategoryRequestDto moveCategoryRequestDto, User admin) {
+        checkAdmin(admin);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
+        Category newCategory = categoryRepository.findByTopic(moveCategoryRequestDto.getCategoryTopic())
+                .orElseThrow(() -> new CategoryNotFoundException("카테고리를 찾을 수 없습니다."));
+
+        post.setCategory(newCategory);
+        postRepository.save(post);
+
+        return new PostResponseDto(post);
+    }
 }

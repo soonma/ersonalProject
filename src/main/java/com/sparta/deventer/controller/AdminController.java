@@ -45,5 +45,15 @@ public class AdminController {
         adminService.deleteUserPost(postId, userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
+   //카테고리 이동
+ @PutMapping("/posts/{postId}")
+    public ResponseEntity<PostResponseDto> moveCategory(
+         @PathVariable Long postId,
+         @RequestBody MoveCategoryRequestDto moveCategoryRequestDto,
+         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        PostResponseDto postResponseDto = adminService.moveCategory(postId, moveCategoryRequestDto,userDetails.getUser());
+        return ResponseEntity.ok(postResponseDto);
+    }
 
 }
