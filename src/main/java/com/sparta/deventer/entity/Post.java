@@ -51,6 +51,14 @@ public class Post extends Timestamped {
         this.category = category;
     }
 
+    public Post(String title, String content, User user, Category category, boolean notice) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+        this.category = category;
+        this.notice = notice;
+    }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;

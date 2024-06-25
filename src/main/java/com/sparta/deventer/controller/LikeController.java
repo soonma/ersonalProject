@@ -15,14 +15,29 @@ public class LikeController {
 
     private final LikeService likeService;
 
+    /**
+     * 좋아요를 처리합니다.
+     *
+     * @param userDetails        현재 인증된 사용자 정보
+     * @param likeableEntityType 좋아요를 할 엔티티 유형
+     * @param likeableEntityId   좋아요를 할 엔티티 ID
+     * @return 좋아요 처리 결과 메시지
+     */
     @PostMapping("/likes")
-    public ResponseEntity<String> isLike(@AuthenticationPrincipal UserDetailsImpl userDetails
-            , @RequestParam("contentType") String contentType
-            , @RequestParam("contentId") Long contentId) {
-        Boolean isLiked = likeService.likeComparison(contentType, contentId,
-                userDetails.getUser());
-        String message = isLiked ? "좋아요가 완료 되었습니다." : "좋아요가 취소 되었습니다.";
+    public ResponseEntity<String> toggleLike(
+        @RequestParam("likeableEntityId") Long likeableEntityId,
+        @RequestParam("likeableEntityType") String likeableEntityType,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        boolean isLiked = likeService.toggleLike(likeableEntityId, likeableEntityType,
+            userDetails.getUser());
+
+        // e.g. "post(Id: 1)의 좋아요가 완료되었습니다."
+        String message =
+            likeableEntityType + "(Id: " + likeableEntityId + ")의 " +
+                (isLiked ? "좋아요가 완료되었습니다.\n" : "좋아요가 취소되었습니다.\n");
         return ResponseEntity.ok()
-                .body(message + "현재 좋아요 갯수 : " + likeService.likeCount(contentType, contentId));
+            .body(message + "좋아요 개수: " + likeService.likeCount(likeableEntityId,
+                likeableEntityType));
     }
 }

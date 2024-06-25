@@ -230,7 +230,7 @@ GET http://localhost:8080/posts
 
 
 ### 카테고리의 게시글 조회
-GET http://localhost:8080/posts?category=1
+GET http://localhost:8080/posts?categoryId=1
 
 
 ### 게시글 수정

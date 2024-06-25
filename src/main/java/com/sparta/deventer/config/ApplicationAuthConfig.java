@@ -18,7 +18,9 @@ public class ApplicationAuthConfig {
     private final UserDetailsService userDetailsService;
 
     /**
-     * 비밀번호를 암호화 하여 안전하게 저장하기 위한 역할 담당
+     * 비밀번호를 암호화하여 안전하게 저장하기 위한 빈을 생성합니다.
+     *
+     * @return PasswordEncoder 객체
      */
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -26,17 +28,23 @@ public class ApplicationAuthConfig {
     }
 
     /**
-     * 시큐리티 인증 을 관리해주고 인증을 한곳에서 일괄적으로 관리해주기위한 역할 담당
+     * 시큐리티 인증 을 관리하고 인증을 한 곳에서 일괄적으로 관리하기 위한 빈을 생성합니다.
+     *
+     * @param config AuthenticationConfiguration 객체
+     * @return AuthenticationManager 객체
+     * @throws Exception 예외가 발생할 수 있음
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+        throws Exception {
+
         return config.getAuthenticationManager();
     }
 
     /**
-     * 인증을 공급해주는 역할 담당
-     * 인증 역할 위임설정
+     * 인증을 공급자 빈을 생성하여 인증 역할을 위임합니다.
+     *
+     * @return DaoAuthenticationProvider 객체
      */
     @Bean
     AuthenticationProvider authenticationProvider() {

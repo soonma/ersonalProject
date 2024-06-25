@@ -8,6 +8,7 @@ import com.sparta.deventer.dto.UpdateProfileRequestDto;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,11 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users/{userId}")
 public class UserController {
 
-    private static final int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 10;
     private final UserService userService;
 
+    /**
+     * 사용자의 프로필을 조회합니다.
+     *
+     * @param userId      조회할 사용자 ID
+     * @param userDetails 현재 인증된 사용자 정보
+     * @return 프로필 응답 DTO
+     */
     @GetMapping
-    public ResponseEntity<Object> getProfile(@PathVariable Long userId,
+    public ResponseEntity<ProfileResponseDto> getProfile(
+        @PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
@@ -39,8 +48,17 @@ public class UserController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
+    /**
+     * 사용자의 모든 게시물을 조회합니다.
+     *
+     * @param userId      조회할 사용자 ID
+     * @param userDetails 현재 인증된 사용자 정보
+     * @param page        페이지 번호
+     * @return 페이지 단위로 나눠진 게시물 응답 DTO
+     */
     @GetMapping("/posts")
-    public ResponseEntity<Object> getAllPosts(@PathVariable Long userId,
+    public ResponseEntity<Page<PostResponseDto>> getAllPosts(
+        @PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(defaultValue = "0") int page) {
 
@@ -50,8 +68,17 @@ public class UserController {
         return ResponseEntity.ok(postResponseDtoPage);
     }
 
+    /**
+     * 사용자의 모든 댓글을 조회합니다.
+     *
+     * @param userId      조회할 사용자 ID
+     * @param userDetails 현재 인증된 사용자 정보
+     * @param page        페이지 번호
+     * @return 페이지 단위로 나눠진 댓글 응답 DTO
+     */
     @GetMapping("/comments")
-    public ResponseEntity<Object> getAllComments(@PathVariable Long userId,
+    public ResponseEntity<Page<CommentResponseDto>> getAllComments(
+        @PathVariable Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(defaultValue = "0") int page) {
 
@@ -62,9 +89,18 @@ public class UserController {
         return ResponseEntity.ok(commentResponseDtoPage);
     }
 
+    /**
+     * 사용자의 프로필을 수정합니다.
+     *
+     * @param userId                  수정할 사용자 ID
+     * @param updateProfileRequestDto 프로필 수정 요청 DTO
+     * @param userDetails             현재 인증된 사용자 정보
+     * @return 수정된 프로필 응답 DTO
+     */
     @PutMapping
-    public ResponseEntity<Object> updateProfile(@PathVariable Long userId,
-        @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
+    public ResponseEntity<ProfileResponseDto> updateProfile(
+        @PathVariable Long userId,
+        @Valid @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
@@ -73,13 +109,22 @@ public class UserController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
+    /**
+     * 사용자의 비밀번호를 변경합니다.
+     *
+     * @param userId                   변경할 사용자 ID
+     * @param changePasswordRequestDto 비밀번호 변경 요청 DTO
+     * @param userDetails              현재 인증된 사용자 정보
+     * @return 비밀번호 변경 완료 메시지
+     */
     @PutMapping("/change-password")
-    public ResponseEntity<Object> changePassword(@PathVariable Long userId,
-        @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
+    public ResponseEntity<String> changePassword(
+        @PathVariable Long userId,
+        @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
         userService.changePassword(userId, changePasswordRequestDto, user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body("비밀번호를 변경했습니다.");
     }
 }
