@@ -1,12 +1,20 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.dto.*;
+import com.sparta.deventer.dto.MoveCategoryRequestDto;
+import com.sparta.deventer.dto.PostRequestDto;
+import com.sparta.deventer.dto.PostResponseDto;
+import com.sparta.deventer.dto.UpdatePostRequestDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.AdminPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin")
@@ -16,13 +24,13 @@ public class AdminPostController {
     private final AdminPostService adminPostService;
 
     // 공지글 생성
-    @PutMapping("/posts/{postId}/notice")
+    @PutMapping("/posts/notice")
     public ResponseEntity<PostResponseDto> createNoticePost(
             @RequestBody PostRequestDto postRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = adminPostService.createNoticePost(postRequestDto,
-            userDetails.getUser());
+                userDetails.getUser());
         return ResponseEntity.ok().body(postResponseDto);
     }
 
@@ -34,7 +42,7 @@ public class AdminPostController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = adminPostService.updateNoticePost(postId,
-            updatePostRequestDto, userDetails.getUser());
+                updatePostRequestDto, userDetails.getUser());
         return ResponseEntity.ok(postResponseDto);
     }
 
@@ -47,15 +55,17 @@ public class AdminPostController {
         adminPostService.deleteUserPost(postId, userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
-   //카테고리 이동
- @PutMapping("/posts/{postId}")
-    public ResponseEntity<PostResponseDto> moveCategory(
-         @PathVariable Long postId,
-         @RequestBody MoveCategoryRequestDto moveCategoryRequestDto,
-         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-     PostResponseDto postResponseDto = adminPostService.moveCategory(postId, moveCategoryRequestDto,
-         userDetails.getUser());
+    //카테고리 이동
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<PostResponseDto> moveCategory(
+            @PathVariable Long postId,
+            @RequestBody MoveCategoryRequestDto moveCategoryRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        PostResponseDto postResponseDto = adminPostService.moveCategory(postId,
+                moveCategoryRequestDto,
+                userDetails.getUser());
         return ResponseEntity.ok(postResponseDto);
     }
 
