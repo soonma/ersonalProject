@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,60 +25,67 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * 일반유저 회원가입
+     * 사용자가 회원가입을 합니다.
      *
-     * @param requestDto 일반유저 회원가입 Request
+     * @param signUpRequestDto 회원가입 요청 DTO
      * @return 회원가입 완료 메세지
      */
     @PostMapping("/auth/sign-up")
-    public ResponseEntity<String> userSignUp(@Valid @RequestBody SignUpRequestDto requestDto) {
-        return ResponseEntity.ok().body(authService.userSignUp(requestDto));
+    public ResponseEntity<String> userSignUp(
+        @Valid @RequestBody SignUpRequestDto signUpRequestDto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(authService.userSignUp(signUpRequestDto));
     }
 
     /**
-     * 로그인 기능
+     * 사용자가 로그인합니다.
      *
-     * @param requestDto 로그인 ID와 패스워드
-     * @param response   억세스토큰과 리플레시토큰 담아줄 Response
+     * @param loginRequestDto 로그인 요청 DTO
+     * @param response        억세스 토큰과 리프레시 토큰을 담아 줄 응답
      * @return 회원가입 완료 메세지
      */
     @PostMapping("/auth/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDto requestDto,
-            HttpServletResponse response) {
-        return ResponseEntity.ok().body(authService.login(requestDto, response));
+    public ResponseEntity<String> login(
+        @Valid @RequestBody LoginRequestDto loginRequestDto,
+        HttpServletResponse response) {
+
+        return ResponseEntity.ok().body(authService.login(loginRequestDto, response));
     }
 
     /**
-     * 깃허브 소셜 로그인
+     * 사용자가 Github 계정으로 로그인합니다.
      *
-     * @param code     사용자가 깃허브로부터 받은 인증코드
-     * @param response 사용자에게 우리 서비스의 억세스와, 리플레시토큰을 반환해줄 Response
+     * @param code     사용자가 Github으로부터 받은 인증코드
+     * @param response 사용자에게 Deventer 서비스의 액세스 토큰과 리프레시 토큰을 반환할 Response
      * @return 성공 메세지
      */
     @GetMapping("/github/callback")
     public String githubCallback(@RequestParam("code") String code, HttpServletResponse response) {
         authService.processGitHubCallback(code, response);
-        return "회원가입 및 로그인 성공";
+        return "회원가입 및 로그인에 성공했습니다.";
     }
 
     /**
-     * 억세스토큰 재발행 기능
+     * 토큰을 재발행합니다.
      *
-     * @param request  기존의 토큰을 확인용으로 담아서 보낼 Request
-     * @param response 새로운 토큰을 새로 담아서 줄 Response
+     * @param request  기존의 토큰을 확인하기 위해 담을 Request
+     * @param response 새로운 토큰을 전달하기 위해 담을 Response
      * @return 토큰 발행 완료 메세지
      */
     @PostMapping("/auth/refresh")
-    public ResponseEntity<String> tokenReissue(HttpServletRequest request,
-            HttpServletResponse response) {
+    public ResponseEntity<String> tokenReissue(
+        HttpServletRequest request,
+        HttpServletResponse response) {
+
         return ResponseEntity.ok().body(authService.tokenReissue(request, response));
     }
 
     /**
-     * 로그아웃 기능
+     * 사용자가 로그아웃합니다.
      *
-     * @param userDetails 시큐리티 컨택스트에 담긴 유저정보(토큰검증후)
-     * @return 로그아웃 만료 메세지
+     * @param userDetails 시큐리티 컨택스트에 담긴 사용자 정보 (토큰 검증 후)
+     * @return 로그아웃 완료 메시지
      */
     @PostMapping("/auth/logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -85,10 +93,10 @@ public class AuthController {
     }
 
     /**
-     * 회원탈퇴 기능
+     * 사용자가 회원을 탈퇴합니다.
      *
-     * @param userDetails 시큐리티 컨택스트에 담긴 유저정보(토큰검증후)
-     * @return 회원탈퇴 만료 메세지
+     * @param userDetails 시큐리티 컨택스트에 담긴 사용자 정보 (토큰 검증 후)
+     * @return 회원탈퇴 완료 메시지
      */
     @DeleteMapping("/auth/withdraw")
     public ResponseEntity<String> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {

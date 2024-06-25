@@ -26,16 +26,16 @@ public class Like extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
-    private long contentId;
+
+    private long likeableEntityId;
 
     @Enumerated(EnumType.STRING)
-    private ContentEnumType contentType;
+    private LikeableEntityType likeableEntityType;
 
     @Builder
-    public Like(User user, long typeId, String type) {
+    public Like(long typeId, String type, User user) {
+        this.likeableEntityId = typeId;
+        this.likeableEntityType = LikeableEntityType.getByType(type);
         this.user = user;
-        this.contentType = ContentEnumType.getByType(type);
-        this.contentId = typeId;
     }
 }

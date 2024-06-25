@@ -29,25 +29,58 @@ public class UserService {
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 사용자의 프로필을 조회합니다.
+     *
+     * @param userId 조회할 사용자 ID
+     * @param user   현재 인증된 사용자
+     * @return 프로필 응답 DTO
+     */
     public ProfileResponseDto getProfile(Long userId, User user) {
-        user.validateId(userId);
+        validateUserId(userId, user);
         return new ProfileResponseDto(user);
     }
 
+    /**
+     * 사용자의 모든 게시물을 조회합니다.
+     *
+     * @param userId   조회할 사용자 ID
+     * @param user     현재 인증된 사용자
+     * @param pageable 페이지 정보
+     * @return 페이지 단위로 나눠진 게시물 응답 DTO
+     */
     public Page<PostResponseDto> getAllPosts(Long userId, User user, Pageable pageable) {
-        user.validateId(userId);
+        validateUserId(userId, user);
         return postRepository.findByUserId(userId, pageable).map(PostResponseDto::new);
     }
 
+    /**
+     * 사용자의 모든 댓글을 조회합니다.
+     *
+     * @param userId   조회할 사용자 ID
+     * @param user     현재 인증된 사용자
+     * @param pageable 페이지 정보
+     * @return 페이지 단위로 나눠진 댓글 응답 DTO
+     */
     public Page<CommentResponseDto> getAllComments(Long userId, User user, Pageable pageable) {
-        user.validateId(userId);
+        validateUserId(userId, user);
         return commentRepository.findByUserId(userId, pageable).map(CommentResponseDto::new);
     }
 
-    public ProfileResponseDto updateProfile(Long userId,
-        UpdateProfileRequestDto updateProfileRequestDto, User user) {
+    /**
+     * 사용자의 프로필을 수정합니다.
+     *
+     * @param userId                  수정할 사용자 ID
+     * @param updateProfileRequestDto 프로필 수정 요청 DTO
+     * @param user                    현재 인증된 사용자
+     * @return 수정된 프로필 응답 DTO
+     */
+    public ProfileResponseDto updateProfile(
+        Long userId,
+        UpdateProfileRequestDto updateProfileRequestDto,
+        User user) {
 
-        user.validateId(userId);
+        validateUserId(userId, user);
 
         user.setNickname(updateProfileRequestDto.getNickname());
         user.setEmail(updateProfileRequestDto.getEmail());
@@ -55,10 +88,19 @@ public class UserService {
         return new ProfileResponseDto(user);
     }
 
-    public void changePassword(Long userId, ChangePasswordRequestDto changePasswordRequestDto,
+    /**
+     * 사용자의 비밀번호를 변경합니다.
+     *
+     * @param userId                   변경할 사용자 ID
+     * @param changePasswordRequestDto 비밀번호 변경 요청 DTO
+     * @param user                     현재 인증된 사용자
+     */
+    public void changePassword(
+        Long userId,
+        ChangePasswordRequestDto changePasswordRequestDto,
         User user) {
 
-        user.validateId(userId);
+        validateUserId(userId, user);
 
         String currentPassword = changePasswordRequestDto.getCurrentPassword();
         String newPassword = changePasswordRequestDto.getNewPassword();
@@ -80,13 +122,26 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * 새로운 비밀번호가 현재 비밀번호와 다른지 검증합니다.
+     *
+     * @param user        현재 사용자
+     * @param newPassword 새로운 비밀번호
+     */
     private void validateNewPassword(User user, String newPassword) {
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new InvalidPasswordException("새 비밀번호는 현재 비밀번호와 달라야 합니다.");
         }
     }
 
-    public void validatePasswordHistory(String newPassword,
+    /**
+     * 새로운 비밀번호가 이전에 사용한 비밀번호와 다른지 검증합니다.
+     *
+     * @param newPassword         새로운 비밀번호
+     * @param passwordHistoryList 비밀번호 변경 이력 목록
+     */
+    private void validatePasswordHistory(
+        String newPassword,
         List<PasswordHistory> passwordHistoryList) {
 
         for (PasswordHistory passwordHistory : passwordHistoryList) {
@@ -94,5 +149,15 @@ public class UserService {
                 throw new InvalidPasswordException("새 비밀번호는 최근 사용한 비밀번호와 달라야 합니다.");
             }
         }
+    }
+
+    /**
+     * 사용자 ID를 검증합니다.
+     *
+     * @param userId 검증할 사용자 ID
+     * @param user   현재 인증된 사용자
+     */
+    private void validateUserId(Long userId, User user) {
+        user.validateId(userId);
     }
 }

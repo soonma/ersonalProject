@@ -108,7 +108,7 @@ Authorization:{{Authorization}}
 Content-Type: application/json
 
 ### 좋아요 테스트
-POST http://localhost:8080/likes?contentType=post&contentId=1
+POST http://localhost:8080/likes?likeableEntityType=post&likeableEntityId=1
 Authorization:{{Authorization}}
 Content-Type: application/json
 

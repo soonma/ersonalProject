@@ -5,8 +5,8 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
-import com.sparta.deventer.enums.MismatchStatusEntity;
 import com.sparta.deventer.enums.NotFoundEntity;
+import com.sparta.deventer.enums.UserActionError;
 import com.sparta.deventer.enums.UserStatus;
 import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.exception.MismatchStatusException;
@@ -27,66 +27,103 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public CommentResponseDto createComment(CommentRequestDto requestDto, User user) {
-        checkUserStatus(user.getId());
+    /**
+     * 댓글을 생성합니다.
+     *
+     * @param commentRequestDto 댓글 생성 요청 DTO
+     * @param user              현재 인증된 사용자 정보
+     * @return 생성된 댓글 응답 DTO
+     */
+    public CommentResponseDto createComment(CommentRequestDto commentRequestDto, User user) {
+        validateUserStatus(user.getId());
 
-        Post post = checkEmptyPost(requestDto.getPostId());
-
-        Comment comment = new Comment(post, user, requestDto.getContent());
+        Post post = getPostByIdOrThrow(commentRequestDto.getPostId());
+        Comment comment = new Comment(commentRequestDto.getContent(), user, post);
 
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
-
     }
 
+    /**
+     * 댓글을 수정합니다.
+     *
+     * @param commentId         수정할 댓글 ID
+     * @param commentRequestDto 댓글 수정 요청 DTO
+     * @param user              현재 인증된 사용자 정보
+     * @return 수정된 댓글 응답 DTO
+     */
     @Transactional
-    public CommentResponseDto updateComment(Long userId, CommentRequestDto requestDto,
-            Long commentId) {
-        checkUserStatus(userId);
-        Comment comment = emptyCheckComment(commentId);
+    public CommentResponseDto updateComment(
+        Long commentId,
+        CommentRequestDto commentRequestDto,
+        User user) {
 
-        checkEqualsUser(comment, userId);
+        validateUserStatus(user.getId());
 
-        comment.update(requestDto.getContent());
+        Comment comment = getCommentByIdOrThrow(commentId);
+        validateUserOwnership(comment, user.getId());
+        comment.update(commentRequestDto.getContent());
 
         return new CommentResponseDto(comment);
     }
 
-    public void deleteComment(Long userId, Long commentId) {
-        checkUserStatus(userId);
-        Comment comment = emptyCheckComment(commentId);
-
-        checkEqualsUser(comment, userId);
-
+    /**
+     * 댓글을 삭제합니다.
+     *
+     * @param commentId 삭제할 댓글 ID
+     * @param user      현재 인증된 사용자 정보
+     */
+    public void deleteComment(Long commentId, User user) {
+        validateUserStatus(user.getId());
+        Comment comment = getCommentByIdOrThrow(commentId);
+        validateUserOwnership(comment, user.getId());
         commentRepository.delete(comment);
     }
 
-    //댓글이 이미 사라졌는지 확인
-    public Comment emptyCheckComment(Long commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.COMMENT_NOT_FOUND));
-    }
-
-    //본인인지 아닌지 확인
-    public void checkEqualsUser(Comment comment, Long userId) {
+    /**
+     * 사용자와 댓글 작성자가 일치하는지 확인합니다.
+     *
+     * @param comment 댓글 객체
+     * @param userId  사용자 ID
+     */
+    private void validateUserOwnership(Comment comment, Long userId) {
         if (!comment.getUser().getId().equals(userId)) {
-            throw new MismatchStatusException(MismatchStatusEntity.MISMATCH_USER);
+            throw new MismatchStatusException(UserActionError.NOT_AUTHORIZED);
         }
     }
 
-    //작업전 게시글이 있는지 확인
-    public Post checkEmptyPost(Long postId) {
+    /**
+     * 사용자 상태를 확인합니다. BLOCKED 상태인 경우 예외를 던집니다.
+     *
+     * @param userId 사용자 ID
+     */
+    private void validateUserStatus(Long userId) {
+        User user = userRepository.findById((userId)).orElseThrow(
+            () -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
+        if (user.getStatus().equals(UserStatus.BLOCKED)) {
+            throw new MismatchStatusException(UserActionError.BLOCKED_USER);
+        }
+    }
+
+    /**
+     * 댓글을 ID로 조회합니다. 존재하지 않으면 예외를 던집니다.
+     *
+     * @param commentId 조회할 댓글 ID
+     * @return 조회된 댓글
+     */
+    private Comment getCommentByIdOrThrow(Long commentId) {
+        return commentRepository.findById(commentId)
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.COMMENT_NOT_FOUND));
+    }
+
+    /**
+     * 게시물을 ID로 조회합니다. 존재하지 않으면 예외를 던집니다.
+     *
+     * @param postId 조회할 게시물 ID
+     * @return 조회된 게시물
+     */
+    private Post getPostByIdOrThrow(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
     }
-
-    //BLOCKED 유저 체크
-    public void checkUserStatus(Long userId) {
-        User checkUser = userRepository.findById((userId)).orElseThrow(
-                () -> new EntityNotFoundException(NotFoundEntity.USER_NOT_FOUND));
-        if (checkUser.getStatus().equals(UserStatus.BLOCKED)) {
-            throw new MismatchStatusException(MismatchStatusEntity.MISMATCH_STATUS_BLOCKED_USER);
-        }
-    }
-
 }

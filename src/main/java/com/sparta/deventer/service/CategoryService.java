@@ -19,101 +19,81 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     /**
-     * 카테고리 생성 로직
+     * 카테고리를 생성합니다.
      *
-     * @param requestDto 카테고리 이름
-     * @return 카테고리 정보
+     * @param categoryRequestDto 카테고리 요청 DTO
+     * @return 생성된 카테고리 정보
      */
-    public CategoryResponseDto createCategory(CategoryRequestDto requestDto) {
+    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
+        validateDuplicateCategoryTopic(categoryRequestDto.getTopic());
 
-        checkDuplicateCategoryTopic(requestDto.getTopic());
-
-        Category category = new Category(requestDto.getTopic());
-
+        Category category = new Category(categoryRequestDto.getTopic());
         categoryRepository.save(category);
-
-        return makeResponseDto(category);
+        return new CategoryResponseDto(category);
     }
 
     /**
-     * 카테고리 조회 로직
+     * 카테고리 목록을 조회합니다.
      *
-     * @return 카테고리 정보 묶음
+     * @return 카테고리 목록
      */
     @Transactional(readOnly = true)
-    public List<CategoryResponseDto> getAllCategory() {
-        return categoryRepository.findAll().stream()
-                .map(category -> new CategoryResponseDto(
-                        category.getId(),
-                        category.getTopic(),
-                        category.getCreatedAt(),
-                        category.getUpdateAt()))
-                .toList();
+    public List<CategoryResponseDto> getAllCategories() {
+        return categoryRepository.findAll().stream().map(CategoryResponseDto::new).toList();
     }
 
     /**
-     * 카테고리 이름 변경 로직
+     * 카테고리 이름을 변경합니다.
      *
-     * @param categoryId 변경할 카테고리 고유번호
-     * @param requestDto 변경할 카테고리 이름
+     * @param categoryId         변경할 카테고리 고유번호
+     * @param categoryRequestDto 변경할 카테고리 요청 DTO
      * @return 변경된 카테고리 정보
      */
     @Transactional
-    public CategoryResponseDto changeCategory(Long categoryId, CategoryRequestDto requestDto) {
-        Category category = getCategoryById(categoryId);
+    public CategoryResponseDto updateCategory(
+        Long categoryId,
+        CategoryRequestDto categoryRequestDto) {
 
-        checkDuplicateCategoryTopic(requestDto.getTopic());
+        Category category = getCategoryByIdOrThrow(categoryId);
+        validateDuplicateCategoryTopic(categoryRequestDto.getTopic());
 
-        category.updateTopic(requestDto.getTopic());
+        category.updateTopic(categoryRequestDto.getTopic());
 
-        return makeResponseDto(category);
+        return new CategoryResponseDto(category);
     }
 
     /**
-     * 카테고리 삭제 로직
+     * 카테고리를 삭제합니다.
      *
      * @param categoryId 삭제할 카테고리 고유번호
-     * @return 삭제 완료 메세지
+     * @return 삭제 완료 메시지
      */
     @Transactional
     public String deleteCategory(Long categoryId) {
-
-        Category category = getCategoryById(categoryId);
-
+        Category category = getCategoryByIdOrThrow(categoryId);
         categoryRepository.delete(category);
-
-        return "[" + category.getTopic() + "] 라는 카테고리가 삭제되었습니다.";
+        return "[" + category.getTopic() + "] 카테고리가 삭제되었습니다.";
     }
 
-    private void checkDuplicateCategoryTopic(String topic) {
+    /**
+     * 카테고리 토픽 중복 확인 로직
+     *
+     * @param topic 확인할 카테고리 토픽
+     */
+    private void validateDuplicateCategoryTopic(String topic) {
         if (categoryRepository.existsByTopic(topic)) {
             throw new CategoryDuplicateException("이미 존재하는 카테고리입니다.");
         }
     }
 
     /**
-     * 카테고리 객체 반환 로직
+     * 카테고리 객체를 ID로 찾고, 찾을 수 없으면 예외를 던집니다.
      *
-     * @param categoryId 찾아올 카테고리 고유번호
-     * @return 카테고리 객체
+     * @param categoryId 찾을 카테고리 ID
+     * @return 찾은 카테고리 객체
      */
-    private Category getCategoryById(Long categoryId) {
+    private Category getCategoryByIdOrThrow(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
-    }
-
-    /**
-     * 카테고리 정보 생성 로직
-     *
-     * @param category 기반이 될 카테고리 객체
-     * @return 정보를 담은 카테고리 객체
-     */
-    private CategoryResponseDto makeResponseDto(Category category) {
-        return new CategoryResponseDto(
-                category.getId(),
-                category.getTopic(),
-                category.getCreatedAt(),
-                category.getUpdateAt()
-        );
+            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
     }
 }
