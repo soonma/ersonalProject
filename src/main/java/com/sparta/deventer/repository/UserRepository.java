@@ -1,21 +1,26 @@
 package com.sparta.deventer.repository;
 
+import com.sparta.deventer.custom.UserRepositoryCustom;
 import com.sparta.deventer.entity.User;
-import com.sparta.deventer.enums.UserLoginType;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
-    Optional<User> findByUsername(String username);
-
-    boolean existsByUsername(String username);
-
-    boolean existsByNickname(String nickname);
-
-    boolean existsByEmail(String email);
-
-    Optional<User> findByEmail(String email);
-
-    Optional<User> findByEmailAndLoginType(String email, UserLoginType loginType);
+//    @Override
+//    Optional<User> findByUsername(String username);
+//
+//    @Override
+//    boolean existsByUsername(String username);
+//
+//    @Override
+//    boolean existsByNickname(String nickname);
+//
+//    @Override
+//    boolean existsByEmail(String email);
+//
+//    @Override
+//    Optional<User> findByEmail(String email);
+//
+//    @Override
+//    Optional<User> findByEmailAndLoginType(String email, UserLoginType loginType);
 }

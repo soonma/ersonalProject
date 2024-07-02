@@ -64,6 +64,7 @@ public class User extends Timestamped {
 
     private LocalDateTime deletedAt;
 
+
     public User(String username, String password, String nickname, UserRole role, String email,
             UserLoginType loginType) {
         this.username = username;

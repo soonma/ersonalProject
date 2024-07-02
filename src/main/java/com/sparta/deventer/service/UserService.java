@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -76,9 +77,9 @@ public class UserService {
      * @return 수정된 프로필 응답 DTO
      */
     public ProfileResponseDto updateProfile(
-        Long userId,
-        UpdateProfileRequestDto updateProfileRequestDto,
-        User user) {
+            Long userId,
+            UpdateProfileRequestDto updateProfileRequestDto,
+            User user) {
 
         validateUserId(userId, user);
 
@@ -96,16 +97,16 @@ public class UserService {
      * @param user                     현재 인증된 사용자
      */
     public void changePassword(
-        Long userId,
-        ChangePasswordRequestDto changePasswordRequestDto,
-        User user) {
+            Long userId,
+            ChangePasswordRequestDto changePasswordRequestDto,
+            User user) {
 
         validateUserId(userId, user);
 
         String currentPassword = changePasswordRequestDto.getCurrentPassword();
         String newPassword = changePasswordRequestDto.getNewPassword();
         List<PasswordHistory> passwordHistoryList =
-            passwordHistoryRepository.findByUserOrderByCreatedAtAsc(user);
+                passwordHistoryRepository.findByUserOrderByCreatedAtAsc(user);
 
         user.validatePassword(passwordEncoder, currentPassword);
         validateNewPassword(user, newPassword);
@@ -141,8 +142,8 @@ public class UserService {
      * @param passwordHistoryList 비밀번호 변경 이력 목록
      */
     private void validatePasswordHistory(
-        String newPassword,
-        List<PasswordHistory> passwordHistoryList) {
+            String newPassword,
+            List<PasswordHistory> passwordHistoryList) {
 
         for (PasswordHistory passwordHistory : passwordHistoryList) {
             if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {

@@ -69,4 +69,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleEntityNotFoundException(NotAdminException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+
+    @ExceptionHandler(MismatchStatusException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(MismatchStatusException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }
