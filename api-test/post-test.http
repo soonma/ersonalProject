@@ -9,7 +9,7 @@
 @content = 내용테스트
 
 @categoryid = 1
-@categoryTopic = Web
+@categoryTopic = 백엔드
 @username = testuser99
 @password = Password123!
 @nickname = 닉네임1
