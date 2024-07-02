@@ -58,12 +58,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         List<Post> postList = queryFactory
                 .select(qPost)
                 .join(qPost.user, qUser)
+                .where(qUser.id.eq(userId))
                 .fetch();
         long total = queryFactory
                 .select(qPost)
                 .join(qPost.user, qUser)
+                .where(qUser.id.eq(userId))
                 .fetch().size();
-        
+
         return new PageImpl<>(postList, pageable, total);
     }
 }
