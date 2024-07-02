@@ -17,6 +17,8 @@ import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.PostRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PostService {
 
+    private static final Logger log = LoggerFactory.getLogger(PostService.class);
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
@@ -63,7 +66,7 @@ public class PostService {
 
         List<Comment> comments = commentRepository.findAllByPostId(postId);
         List<CommentResponseDto> commentResponseDtos = comments.stream()
-            .map(CommentResponseDto::new).toList();
+                .map(CommentResponseDto::new).toList();
 
         return new PostWithCommentsResponseDto(postResponseDto, commentResponseDtos);
     }
@@ -76,12 +79,12 @@ public class PostService {
      */
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
         Pageable sortedByCreatedAtDesc = PageRequest.of(
-            pageable.getPageNumber(),
-            pageable.getPageSize(),
-            Sort.by("createdAt").descending()
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
         );
         return postRepository.findAll(sortedByCreatedAtDesc)
-            .map(PostResponseDto::new);
+                .map(PostResponseDto::new);
     }
 
     /**
@@ -93,17 +96,18 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPostsByCategory(Long categoryId, Pageable pageable) {
+        log.info("categoryId : {}", categoryId);
         Category category = getCategoryByIdOrThrow(categoryId);
 
         Pageable sortedByCreatedAtDesc = PageRequest.of(
-            pageable.getPageNumber(),
-            pageable.getPageSize(),
-            Sort.by("createdAt").descending()
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
         );
 
         return postRepository.findAllByCategory(category,
-                sortedByCreatedAtDesc)
-            .map(PostResponseDto::new);
+                        sortedByCreatedAtDesc)
+                .map(PostResponseDto::new);
     }
 
     /**
@@ -116,9 +120,9 @@ public class PostService {
      */
     @Transactional
     public PostResponseDto updatePost(
-        Long postId,
-        UpdatePostRequestDto updatePostRequestDto,
-        User user) {
+            Long postId,
+            UpdatePostRequestDto updatePostRequestDto,
+            User user) {
 
         validateUserNotBlocked(user);
         Post post = getPostByIdOrThrow(postId);
@@ -175,7 +179,7 @@ public class PostService {
      */
     private Category getCategoryByTopicOrThrow(String topic) {
         return categoryRepository.findByTopic(topic)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
     }
 
     /**
@@ -186,7 +190,7 @@ public class PostService {
      */
     private Category getCategoryByIdOrThrow(Long categoryId) {
         return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.CATEGORY_NOT_FOUND));
     }
 
     /**
@@ -197,6 +201,6 @@ public class PostService {
      */
     private Post getPostByIdOrThrow(Long postId) {
         return postRepository.findById(postId)
-            .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
     }
 }

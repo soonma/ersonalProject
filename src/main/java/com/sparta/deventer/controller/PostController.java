@@ -8,6 +8,8 @@ import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private static final int PAGE_SIZE = 10;
+    private static final Logger log = LoggerFactory.getLogger(PostController.class);
     private final PostService postService;
 
     /**
@@ -41,11 +44,11 @@ public class PostController {
      */
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(
-        @Valid @RequestBody CreatePostRequestDto createPostRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @Valid @RequestBody CreatePostRequestDto createPostRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = postService.createPost(createPostRequestDto,
-            userDetails.getUser());
+                userDetails.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
     }
 
@@ -69,7 +72,7 @@ public class PostController {
      */
     @GetMapping
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(
-        @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<PostResponseDto> postResponseDtoPage = postService.getAllPosts(pageable);
@@ -85,12 +88,13 @@ public class PostController {
      */
     @GetMapping(params = "category")
     public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(
-        @RequestParam Long categoryId,
-        @RequestParam(defaultValue = "0") int page) {
+            @RequestParam Long categoryId,
+            @RequestParam(defaultValue = "0") int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        log.info("여기를 지나가나?");
         Page<PostResponseDto> postResponseDtoPage = postService.getPostsByCategory(categoryId,
-            pageable);
+                pageable);
         return ResponseEntity.ok(postResponseDtoPage);
     }
 
@@ -104,12 +108,12 @@ public class PostController {
      */
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(
-        @PathVariable Long postId,
-        @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long postId,
+            @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         PostResponseDto postResponseDto = postService.updatePost(postId, updatePostRequestDto,
-            userDetails.getUser());
+                userDetails.getUser());
         return ResponseEntity.ok(postResponseDto);
     }
 
@@ -122,8 +126,8 @@ public class PostController {
      */
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(
-        @PathVariable Long postId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         postService.deletePost(postId, userDetails.getUser());
         return ResponseEntity.ok().body("게시물을 삭제했습니다.");

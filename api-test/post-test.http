@@ -8,8 +8,8 @@
 @title = 제목
 @content = 내용테스트
 
-@categoryid = 1
-@categoryTopic = 백엔드
+@categoryid = 3
+@categoryTopic = 잡지식
 @username = testuser99
 @password = Password123!
 @nickname = 닉네임1
