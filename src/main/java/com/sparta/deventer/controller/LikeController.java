@@ -1,5 +1,6 @@
 package com.sparta.deventer.controller;
 
+import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.LikeService;
@@ -49,7 +50,7 @@ public class LikeController {
                         likeableEntityType));
     }
 
-    @GetMapping
+    @GetMapping("/posts")
     public ResponseEntity<Page<PostResponseDto>> myLikePost(
             @RequestParam("likeableEntityType") String likeableEntityType,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -59,6 +60,22 @@ public class LikeController {
 
         Page<PostResponseDto> postPage = likeService.myLikePost(
                 likeableEntityType, userDetails, pageable);
+
         return ResponseEntity.ok().body(postPage);
     }
+
+    @GetMapping(("/comments"))
+    ResponseEntity<Page<CommentResponseDto>> myLikeComment(
+            @RequestParam("likeableEntityType") String likeableEntityType,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
+        Page<CommentResponseDto> commentPage = likeService.myLikeComment(
+                likeableEntityType, userDetails, pageable);
+
+        return ResponseEntity.ok().body(commentPage);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Like;
@@ -101,6 +102,14 @@ public class LikeService {
         }
     }
 
+    /**
+     * 내가 좋아요한 게시글의 정보를 조회 합니다
+     *
+     * @param userDetails        인가된 유저 정보
+     * @param likeableEntityType 좋아요를 할 엔티티의 타입 (POST 또는 COMMENT)
+     * @param pageable           페이지 요청 정보
+     */
+
     public Page<PostResponseDto> myLikePost(String likeableEntityType,
             UserDetailsImpl userDetails, Pageable pageable) {
 
@@ -125,6 +134,39 @@ public class LikeService {
             responseDtoList.add(new PostResponseDto(post));
         }
         return new PageImpl<>(responseDtoList, sortedByCreatedAtDesc, posts.size());
+    }
+
+    /**
+     * 내가 좋아요한 댓글의 정보를 조회 합니다
+     *
+     * @param userDetails        인가된 유저 정보
+     * @param likeableEntityType 좋아요를 할 엔티티의 타입 (POST 또는 COMMENT)
+     * @param pageable           페이지 요청 정보
+     */
+    public Page<CommentResponseDto> myLikeComment(String likeableEntityType,
+            UserDetailsImpl userDetails, Pageable pageable) {
+
+        Pageable sortedByCreatedAtDesc = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        List<Like> likes = likeRepository
+                .findAllByLikeableEntityTypeAndUserId(
+                        LikeableEntityType.getByType(likeableEntityType),
+                        userDetails.getUser().getId());
+
+        List<Comment> comments = new ArrayList<>();
+        for (Like like : likes) {
+            comments.add(commentRepository.findById(like.getLikeableEntityId()).get());
+        }
+
+        List<CommentResponseDto> responseDtoList = new ArrayList<>();
+        for (Comment comment : comments) {
+            responseDtoList.add(new CommentResponseDto(comment));
+        }
+        return new PageImpl<>(responseDtoList, sortedByCreatedAtDesc, comments.size());
     }
 }
 

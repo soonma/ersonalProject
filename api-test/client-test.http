@@ -280,10 +280,13 @@ Authorization: {{Authorization}}
 POST http://localhost:8080/likes?likeableEntityType=post&likeableEntityId=4
 Authorization:{{Authorization}}
 
-###
-GET http://localhost:8080/likes?likeableEntityType=post
+### 내가 좋아요한 게시글 정보
+GET http://localhost:8080/likes/posts?likeableEntityType=post
 Authorization:{{Authorization}}
 
+### 내가 좋아요한 댓글 정보
+GET http://localhost:8080/likes/comments?likeableEntityType=comment
+Authorization:{{Authorization}}
 
 ### 스크랩 기능
 POST http://localhost:8080/scraps/posts/2
