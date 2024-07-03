@@ -31,12 +31,22 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
     }
 
     @Override
-    public List<Like> findAllByLikeableEntityIdAndLikeableEntityType(Long likableEntityId,
+    public List<Like> findAllByLikeableEntityIdAndLikeableEntityType(Long likeableEntityId,
             LikeableEntityType likeableEntityType) {
         QLike qLike = QLike.like;
         return jpaQueryFactory.select(qLike)
-                .where(qLike.likeableEntityId.eq(likableEntityId))
+                .where(qLike.likeableEntityId.eq(likeableEntityId))
                 .where(qLike.likeableEntityType.eq(likeableEntityType))
+                .fetch();
+    }
+
+    @Override
+    public List<Like> findAllByLikeableEntityTypeAndUserId(
+            LikeableEntityType likeableEntityType, Long userId) {
+        QLike qLike = QLike.like;
+        return jpaQueryFactory.select(qLike)
+                .where(qLike.likeableEntityType.eq(likeableEntityType))
+                .where(qLike.user.id.eq(userId))
                 .fetch();
     }
 }

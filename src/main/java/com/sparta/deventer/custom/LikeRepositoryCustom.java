@@ -12,4 +12,6 @@ public interface LikeRepositoryCustom {
 
     List<Like> findAllByLikeableEntityIdAndLikeableEntityType(Long likableEntityId,
             LikeableEntityType likeableEntityType);
+
+    List<Like> findAllByLikeableEntityTypeAndUserId(LikeableEntityType byType, Long userId);
 }

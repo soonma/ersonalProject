@@ -12,4 +12,5 @@ public interface PostRepositoryCustom {
     Page<Post> findAll(Pageable pageable);
 
     Page<Post> findByUserId(Long userId, Pageable pageable);
+
 }

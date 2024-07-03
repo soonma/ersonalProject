@@ -149,7 +149,14 @@ public class PostService {
     }
 
     /**
-     * 사용자 상태가 BLOCKED인지 확인합니다.
+     * 게시물을 삭제합니다.
+     *
+     * @param postId 삭제할 게시물 ID
+     * @param user   현재 인증된 사용자 정보
+     */
+
+    /**
+     * 내가 좋아하는 게시글 목록 조회기능 추가하기
      *
      * @param user 확인할 사용자 객체
      */

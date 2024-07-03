@@ -1,5 +1,6 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.entity.Comment;
 import com.sparta.deventer.entity.Like;
 import com.sparta.deventer.entity.LikeableEntityType;
@@ -12,8 +13,16 @@ import com.sparta.deventer.exception.MismatchStatusException;
 import com.sparta.deventer.repository.CommentRepository;
 import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PostRepository;
+import com.sparta.deventer.security.UserDetailsImpl;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +46,7 @@ public class LikeService {
     public boolean toggleLike(Long likeableEntityId, String likeableEntityType, User user) {
         LikeableEntityType entityType = LikeableEntityType.getByType(likeableEntityType);
         Optional<Like> optionalLike = likeRepository.findByLikeableEntityIdAndLikeableEntityTypeAndUserId(
-            likeableEntityId, entityType, user.getId());
+                likeableEntityId, entityType, user.getId());
 
         if (optionalLike.isEmpty()) {
             validateLikeableEntityOwnership(likeableEntityId, entityType, user);
@@ -60,7 +69,7 @@ public class LikeService {
      */
     public int likeCount(Long likeableEntityId, String likeableEntityType) {
         return likeRepository.findAllByLikeableEntityIdAndLikeableEntityType(likeableEntityId,
-            LikeableEntityType.getByType(likeableEntityType)).size();
+                LikeableEntityType.getByType(likeableEntityType)).size();
     }
 
     /**
@@ -71,25 +80,51 @@ public class LikeService {
      * @param user               현재 인증된 사용자
      */
     private void validateLikeableEntityOwnership(
-        Long likeableEntityId,
-        LikeableEntityType likeableEntityType,
-        User user) {
+            Long likeableEntityId,
+            LikeableEntityType likeableEntityType,
+            User user) {
 
         if (likeableEntityType == LikeableEntityType.POST) {
             Post post = postRepository.findById(likeableEntityId).orElseThrow(
-                () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
+                    () -> new EntityNotFoundException(NotFoundEntity.POST_NOT_FOUND));
             if (post.getUser().getId().equals(user.getId())) {
                 throw new MismatchStatusException(UserActionError.SELF_ACTION_NOT_ALLOWED);
             }
         } else if (likeableEntityType == LikeableEntityType.COMMENT) {
             Comment comment = commentRepository.findById(likeableEntityId).orElseThrow(
-                () -> new EntityNotFoundException(NotFoundEntity.COMMENT_NOT_FOUND));
+                    () -> new EntityNotFoundException(NotFoundEntity.COMMENT_NOT_FOUND));
             if (comment.getUser().getId().equals(user.getId())) {
                 throw new MismatchStatusException(UserActionError.SELF_ACTION_NOT_ALLOWED);
             }
         } else {
             throw new IllegalArgumentException("좋아요를 할 수 없는 엔티티 타입입니다.");
         }
+    }
+
+    public Page<PostResponseDto> myLikePost(String likeableEntityType,
+            UserDetailsImpl userDetails, Pageable pageable) {
+
+        Pageable sortedByCreatedAtDesc = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        List<Like> likes = likeRepository
+                .findAllByLikeableEntityTypeAndUserId(
+                        LikeableEntityType.getByType(likeableEntityType),
+                        userDetails.getUser().getId());
+
+        List<Post> posts = new ArrayList<>();
+        for (Like like : likes) {
+            posts.add(postRepository.findById(like.getLikeableEntityId()).get());
+        }
+
+        List<PostResponseDto> responseDtoList = new ArrayList<>();
+        for (Post post : posts) {
+            responseDtoList.add(new PostResponseDto(post));
+        }
+        return new PageImpl<>(responseDtoList, sortedByCreatedAtDesc, posts.size());
     }
 }
 

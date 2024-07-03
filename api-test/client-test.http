@@ -25,7 +25,7 @@
 
 @categoryId = 1
 
-@categoryTopic = 백엔드
+@categoryTopic = Mobile
 
 @admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT09
 
@@ -277,7 +277,11 @@ Authorization: {{Authorization}}
 
 
 ### 좋아요 기능
-POST http://localhost:8080/likes?contentType=post&contentId=3
+POST http://localhost:8080/likes?likeableEntityType=post&likeableEntityId=4
+Authorization:{{Authorization}}
+
+###
+GET http://localhost:8080/likes?likeableEntityType=post
 Authorization:{{Authorization}}
 
 
