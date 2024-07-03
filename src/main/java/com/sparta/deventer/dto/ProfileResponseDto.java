@@ -10,11 +10,15 @@ public class ProfileResponseDto {
     private final String username;
     private final String nickname;
     private final String email;
+    private final long postLikeCount;
+    private final long commentLikeCount;
 
-    public ProfileResponseDto(User user) {
+    public ProfileResponseDto(User user, long postLikeCount, long commentLikeCount) {
         this.userId = user.getId();
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
+        this.postLikeCount = postLikeCount;
+        this.commentLikeCount = commentLikeCount;
     }
 }

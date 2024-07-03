@@ -5,10 +5,12 @@ import com.sparta.deventer.dto.CommentResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.dto.ProfileResponseDto;
 import com.sparta.deventer.dto.UpdateProfileRequestDto;
+import com.sparta.deventer.entity.LikeableEntityType;
 import com.sparta.deventer.entity.PasswordHistory;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.exception.InvalidPasswordException;
 import com.sparta.deventer.repository.CommentRepository;
+import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PasswordHistoryRepository;
 import com.sparta.deventer.repository.PostRepository;
 import com.sparta.deventer.repository.UserRepository;
@@ -29,6 +31,7 @@ public class UserService {
     private final CommentRepository commentRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LikeRepository likeRepository;
 
     /**
      * 사용자의 프로필을 조회합니다.
@@ -39,7 +42,11 @@ public class UserService {
      */
     public ProfileResponseDto getProfile(Long userId, User user) {
         validateUserId(userId, user);
-        return new ProfileResponseDto(user);
+        long postLikeCount = likeRepository.findAllByLikeableEntityTypeAndUserId(
+                LikeableEntityType.POST, userId).size();
+        long commentLikeCount = likeRepository.findAllByLikeableEntityTypeAndUserId(
+                LikeableEntityType.COMMENT, userId).size();
+        return new ProfileResponseDto(user, postLikeCount, commentLikeCount);
     }
 
     /**
@@ -85,8 +92,14 @@ public class UserService {
 
         user.setNickname(updateProfileRequestDto.getNickname());
         user.setEmail(updateProfileRequestDto.getEmail());
+
+        long postLikeCount = likeRepository.findAllByLikeableEntityTypeAndUserId(
+                LikeableEntityType.POST, userId).size();
+        long commentLikeCount = likeRepository.findAllByLikeableEntityTypeAndUserId(
+                LikeableEntityType.COMMENT, userId).size();
+
         userRepository.save(user);
-        return new ProfileResponseDto(user);
+        return new ProfileResponseDto(user, postLikeCount, commentLikeCount);
     }
 
     /**
