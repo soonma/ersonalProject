@@ -10,4 +10,6 @@ public class PostWithCommentsResponseDto {
 
     private final PostResponseDto postResponseDto;
     private final List<CommentResponseDto> commentResponseDtoList;
+    private final long postLikeCount;
+    
 }

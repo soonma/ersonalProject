@@ -7,6 +7,7 @@ import com.sparta.deventer.dto.PostWithCommentsResponseDto;
 import com.sparta.deventer.dto.UpdatePostRequestDto;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Comment;
+import com.sparta.deventer.entity.LikeableEntityType;
 import com.sparta.deventer.entity.Post;
 import com.sparta.deventer.entity.User;
 import com.sparta.deventer.enums.NotFoundEntity;
@@ -14,7 +15,9 @@ import com.sparta.deventer.enums.UserStatus;
 import com.sparta.deventer.exception.EntityNotFoundException;
 import com.sparta.deventer.repository.CategoryRepository;
 import com.sparta.deventer.repository.CommentRepository;
+import com.sparta.deventer.repository.LikeRepository;
 import com.sparta.deventer.repository.PostRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     /**
      * 게시물을 생성합니다.
@@ -62,13 +66,22 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostWithCommentsResponseDto getPostDetail(Long postId) {
         Post post = getPostByIdOrThrow(postId);
+        long commentLikeCount;
+        
         PostResponseDto postResponseDto = new PostResponseDto(post);
-
         List<Comment> comments = commentRepository.findAllByPostId(postId);
-        List<CommentResponseDto> commentResponseDtos = comments.stream()
-                .map(CommentResponseDto::new).toList();
+        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
 
-        return new PostWithCommentsResponseDto(postResponseDto, commentResponseDtos);
+        for (Comment comment : comments) {
+            commentLikeCount = likeRepository.findAllByLikeableEntityIdAndLikeableEntityType(
+                    comment.getId(), LikeableEntityType.COMMENT).size();
+            commentResponseDtos.add(new CommentResponseDto(comment, commentLikeCount));
+        }
+
+        long postLikeCount = likeRepository.findAllByLikeableEntityIdAndLikeableEntityType(postId,
+                LikeableEntityType.POST).size();
+
+        return new PostWithCommentsResponseDto(postResponseDto, commentResponseDtos, postLikeCount);
     }
 
     /**

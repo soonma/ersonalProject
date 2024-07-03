@@ -14,14 +14,16 @@ public class CommentResponseDto {
     private String nickNmae;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+    private long commentLikeCount;
 
 
-    public CommentResponseDto(Comment comment) {
+    public CommentResponseDto(Comment comment, long commentLikeCount) {
         this.content = comment.getContent();
         this.id = comment.getId();
         this.userId = comment.getUser().getId();
         this.nickNmae = comment.getUser().getNickname();
         this.createAt = comment.getCreatedAt();
         this.updateAt = comment.getUpdateAt();
+        this.commentLikeCount = commentLikeCount;
     }
 }
