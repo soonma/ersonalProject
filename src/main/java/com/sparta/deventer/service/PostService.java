@@ -1,6 +1,6 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.CommentResponseDto;
+import com.sparta.deventer.dto.CommentWithLikeResponseDto;
 import com.sparta.deventer.dto.CreatePostRequestDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.dto.PostWithCommentsResponseDto;
@@ -67,15 +67,15 @@ public class PostService {
     public PostWithCommentsResponseDto getPostDetail(Long postId) {
         Post post = getPostByIdOrThrow(postId);
         long commentLikeCount;
-        
+
         PostResponseDto postResponseDto = new PostResponseDto(post);
         List<Comment> comments = commentRepository.findAllByPostId(postId);
-        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
+        List<CommentWithLikeResponseDto> commentResponseDtos = new ArrayList<>();
 
         for (Comment comment : comments) {
             commentLikeCount = likeRepository.findAllByLikeableEntityIdAndLikeableEntityType(
                     comment.getId(), LikeableEntityType.COMMENT).size();
-            commentResponseDtos.add(new CommentResponseDto(comment, commentLikeCount));
+            commentResponseDtos.add(new CommentWithLikeResponseDto(comment, commentLikeCount));
         }
 
         long postLikeCount = likeRepository.findAllByLikeableEntityIdAndLikeableEntityType(postId,

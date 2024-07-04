@@ -9,7 +9,7 @@ import lombok.Getter;
 public class PostWithCommentsResponseDto {
 
     private final PostResponseDto postResponseDto;
-    private final List<CommentResponseDto> commentResponseDtoList;
+    private final List<CommentWithLikeResponseDto> commentResponseDtos;
     private final long postLikeCount;
-    
+
 }
