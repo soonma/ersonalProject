@@ -1,5 +1,6 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.FollowUserInfoResponseDto;
 import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
 import com.sparta.deventer.entity.Follow;
@@ -72,8 +73,9 @@ public class FollowService {
                 postResponseDtos.add(new PostResponseDto(post));
             }
             followWithPostResponseDto.add(
-                    new FollowWithPostResponseDto(follow.getFollowing(), postResponseDtos));
-
+                    new FollowWithPostResponseDto(
+                            new FollowUserInfoResponseDto(follow.getFollowing()),
+                            postResponseDtos));
         }
 
         return new PageImpl<>(followWithPostResponseDto

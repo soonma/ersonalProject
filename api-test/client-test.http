@@ -2,6 +2,9 @@
 @username = user2345
 @adminUsername = admin1234
 
+@username1 = user23456
+
+
 @password1 = Abcdef12345!
 @password2 = asdgfA123@42
 @password3 = Ewwqas@12341
@@ -11,21 +14,23 @@
 
 @nickname1 = first_name
 @nickname2 = second_name
+@nickname3 = second_name3
 
 @updateNickname = update_test
 
 @email = user123@email.com
+@email2 = user1234@email.com
 @adminEmail = admin123@email.com
 
 @updateEmail = update123@email.com
 
 @userId = 1
 
-@postId = 1
+@postId = 2
 
 @categoryId = 1
 
-@categoryTopic = Mobile
+@categoryTopic = Spring
 
 @admincode = WkdWMlpXNTBaWElnYzNWd1pYSWdZV1J0YVc0Z1kyOWtaUT09
 
@@ -36,10 +41,10 @@ POST http://localhost:8080/auth/sign-up
 Content-Type: application/json
 
 {
-  "username":"{{username}}",
+  "username":"{{username1}}",
   "password":"{{password1}}",
-  "nickname":"{{nickname1}}",
-  "email":"{{email}}"
+  "nickname":"{{nickname3}}",
+  "email":"{{email2}}"
 }
 
 
@@ -108,7 +113,7 @@ Authorization:{{Authorization}}
 
 
 ### 유저 프로필 조회
-GET http://localhost:8080/users/{{userId}}
+GET http://localhost:8080/users/1
 Authorization: {{Authorization}}
 
 
@@ -230,7 +235,7 @@ GET http://localhost:8080/posts
 
 
 ### 카테고리의 게시글 조회
-GET http://localhost:8080/posts?categoryId=1
+GET http://localhost:8080/posts?categoryId=4
 
 
 ### 게시글 수정
@@ -257,7 +262,7 @@ Content-Type: application/json
 
 {
   "postId": {{postId}},
-  "content": "댓글 내용"
+  "content": "댓글 내용3"
 }
 
 
@@ -277,7 +282,7 @@ Authorization: {{Authorization}}
 
 
 ### 좋아요 기능
-POST http://localhost:8080/likes?likeableEntityType=post&likeableEntityId=4
+POST http://localhost:8080/likes?likeableEntityType=comment&likeableEntityId=3
 Authorization:{{Authorization}}
 
 ### 내가 좋아요한 게시글 정보
@@ -295,4 +300,13 @@ Authorization:{{Authorization}}
 
 ### 스크랩 내용 확인
 GET http://localhost:8080/scraps/users/{{userId}}
+Authorization: {{Authorization}}
+
+
+### 팔로우
+POST http://localhost:8080/follows?following=2
+Authorization: {{Authorization}}
+
+### 팔로우 게시글 조회
+GET http://localhost:8080/follows/post
 Authorization: {{Authorization}}

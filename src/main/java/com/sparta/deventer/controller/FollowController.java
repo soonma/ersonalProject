@@ -4,6 +4,8 @@ import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.FollowService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,19 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/follow")
+@RequestMapping("/follows")
 @RequiredArgsConstructor
 @RestController
 public class FollowController {
 
     private static final int PAGE_SIZE = 5;
+    private static final Logger log = LoggerFactory.getLogger(FollowController.class);
     private final FollowService followService;
 
     @PostMapping
     public ResponseEntity<String> toggleFollow(
             @RequestParam("following") Long following,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
+        log.info("여기 오는지 확인 {}", following);
         boolean isFollow = followService.toggleFollow(following,
                 userDetails.getUser());
 
@@ -41,7 +44,6 @@ public class FollowController {
     @GetMapping("/post")
     public ResponseEntity<Page<FollowWithPostResponseDto>> followPostList(
             @AuthenticationPrincipal UserDetailsImpl userDetails
-
             , @RequestParam(defaultValue = "0") int page
     ) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
