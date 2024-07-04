@@ -9,9 +9,9 @@
 @content = 내용테스트
 
 @categoryid = 3
-@categoryTopic = 잡지식
-@username = testuser99
-@password = Password123!
+@categoryTopic = FrontEnd
+@username = user2345
+@password = Abcdef12345!
 @nickname = 닉네임1
 @email = test9@example.com
 

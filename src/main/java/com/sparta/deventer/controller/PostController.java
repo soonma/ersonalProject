@@ -86,12 +86,13 @@ public class PostController {
      * @param page       페이지 번호
      * @return 페이지네이션된 카테고리별 게시물 목록
      */
-    @GetMapping(params = "category")
+    @GetMapping(params = "categoryId")
     public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(
             @RequestParam Long categoryId,
             @RequestParam(defaultValue = "0") int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        log.info("categoryId : {}", categoryId);
         Page<PostResponseDto> postResponseDtoPage = postService.getPostsByCategory(categoryId,
                 pageable);
         return ResponseEntity.ok(postResponseDtoPage);
