@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(("/likes"))
 public class LikeController {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 5;
     private final LikeService likeService;
 
     /**

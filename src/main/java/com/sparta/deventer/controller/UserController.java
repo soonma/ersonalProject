@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users/{userId}")
 public class UserController {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 5;
     private final UserService userService;
 
     /**
@@ -40,8 +40,8 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<ProfileResponseDto> getProfile(
-        @PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
         ProfileResponseDto profileResponseDto = userService.getProfile(userId, user);
@@ -58,9 +58,9 @@ public class UserController {
      */
     @GetMapping("/posts")
     public ResponseEntity<Page<PostResponseDto>> getAllPosts(
-        @PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestParam(defaultValue = "0") int page) {
+            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "0") int page) {
 
         User user = userDetails.getUser();
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
@@ -78,14 +78,14 @@ public class UserController {
      */
     @GetMapping("/comments")
     public ResponseEntity<Page<CommentResponseDto>> getAllComments(
-        @PathVariable Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestParam(defaultValue = "0") int page) {
+            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "0") int page) {
 
         User user = userDetails.getUser();
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<CommentResponseDto> commentResponseDtoPage = userService.getAllComments(userId, user,
-            pageable);
+                pageable);
         return ResponseEntity.ok(commentResponseDtoPage);
     }
 
@@ -99,13 +99,13 @@ public class UserController {
      */
     @PutMapping
     public ResponseEntity<ProfileResponseDto> updateProfile(
-        @PathVariable Long userId,
-        @Valid @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateProfileRequestDto updateProfileRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
         ProfileResponseDto profileResponseDto = userService.updateProfile(userId,
-            updateProfileRequestDto, user);
+                updateProfileRequestDto, user);
         return ResponseEntity.ok(profileResponseDto);
     }
 
@@ -119,9 +119,9 @@ public class UserController {
      */
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(
-        @PathVariable Long userId,
-        @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @PathVariable Long userId,
+            @Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
         userService.changePassword(userId, changePasswordRequestDto, user);

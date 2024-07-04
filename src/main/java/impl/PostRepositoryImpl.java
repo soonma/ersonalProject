@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.deventer.custom.PostRepositoryCustom;
 import com.sparta.deventer.entity.Category;
 import com.sparta.deventer.entity.Post;
+import com.sparta.deventer.entity.QCategory;
 import com.sparta.deventer.entity.QPost;
 import com.sparta.deventer.entity.QUser;
 import java.util.List;
@@ -20,16 +21,19 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Override
     public Page<Post> findAllByCategory(Category category, Pageable pageable) {
         QPost qPost = QPost.post;
+        QCategory qCategory = QCategory.category;
         List<Post> postList = queryFactory
                 .select(qPost)
-                .where(qPost.category.eq(category))
+                .join(qPost.category, qCategory)
+                .where(qCategory.eq(category))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long total = queryFactory
                 .select(qPost)
-                .where(qPost.category.eq(category))
+                .join(qPost.category, qCategory)
+                .where(qCategory.eq(category))
                 .fetch().size();
 
         return new PageImpl<>(postList, pageable, total);
@@ -68,4 +72,17 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         return new PageImpl<>(postList, pageable, total);
     }
+
+    @Override
+    public List<Post> findByUserId(Long userId) {
+        QPost qPost = QPost.post;
+        QUser qUser = QUser.user;
+
+        return queryFactory
+                .select(qPost)
+                .join(qPost.user, qUser)
+                .where(qUser.id.eq(userId))
+                .fetch();
+    }
+
 }

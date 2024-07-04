@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PostController {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 5;
     private static final Logger log = LoggerFactory.getLogger(PostController.class);
     private final PostService postService;
 
@@ -92,7 +92,6 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        log.info("여기를 지나가나?");
         Page<PostResponseDto> postResponseDtoPage = postService.getPostsByCategory(categoryId,
                 pageable);
         return ResponseEntity.ok(postResponseDtoPage);
