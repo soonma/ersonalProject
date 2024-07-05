@@ -1,7 +1,9 @@
 package impl;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.deventer.custom.FollowRepositoryCustom;
+import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.entity.Follow;
 import com.sparta.deventer.entity.QFollow;
 import com.sparta.deventer.entity.QUser;
@@ -9,6 +11,7 @@ import com.sparta.deventer.entity.User;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 
@@ -44,4 +47,22 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
                 .orderBy(qFollow.following.nickname.asc())
                 .fetch();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FollowTopTenResponseDto> findAllGroupBy() {
+        QFollow qFollow = QFollow.follow;
+        QUser qFollowingUser = QUser.user;
+
+        return queryFactory.select(
+                        Projections.constructor(FollowTopTenResponseDto.class, qFollowingUser,
+                                qFollow.count()))
+                .from(qFollow)
+                .join(qFollow.following, qFollowingUser)
+                .where(qFollow.following.eq(qFollowingUser))
+                .groupBy(qFollowingUser)
+                .fetch();
+    }
+
+
 }

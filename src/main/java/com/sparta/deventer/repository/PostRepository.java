@@ -12,7 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 //    Page<Post> findAllByCategory(Category category, Pageable pageable);
 //
 //    @Override
-//    Page<Post> findAll(Pageable pageable);
+//    Page<Post> findAllGroupBy(Pageable pageable);
 //
 //    @Override
 //    Page<Post> findByUserId(Long userId, Pageable pageable);

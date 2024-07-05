@@ -1,5 +1,6 @@
 package com.sparta.deventer.service;
 
+import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.dto.FollowUserInfoResponseDto;
 import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
@@ -29,6 +30,13 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
 
+    /**
+     * 팔로우를 합니다. 만약 팔로우가 되어있으면 팔로우를 해제 합니다
+     * <p>
+     * following 누구를 팔로우 할것있가 follower 누가 팔로우를 했는가
+     *
+     * @return 팔로우 여부
+     */
     public boolean toggleFollow(Long following, User user) {
         User followingUser = getFindUser(following);
 
@@ -53,6 +61,14 @@ public class FollowService {
         List<Follow> followList = followRepository.findByFollower(user);
         return followList.size();
     }
+
+    /**
+     * 팔로우한 유저의 게시글 정보를 보여줍니다.
+     * <p>
+     * following 누구를 팔로우 할것있가,follower 누가 팔로우를 했는가
+     *
+     * @return 팔로우 여부
+     */
 
     public Page<FollowWithPostResponseDto> followPostList(UserDetailsImpl userDetails,
             Pageable pageable) {
@@ -86,5 +102,10 @@ public class FollowService {
         return userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("유저가 존재 하지 않습니다.")
         );
+    }
+
+    public List<FollowTopTenResponseDto> followTopTen() {
+        List<FollowTopTenResponseDto> follows = followRepository.findAllGroupBy();
+        return follows;
     }
 }

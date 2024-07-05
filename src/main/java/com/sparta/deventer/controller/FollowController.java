@@ -1,8 +1,10 @@
 package com.sparta.deventer.controller;
 
+import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.FollowService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ public class FollowController {
     private static final Logger log = LoggerFactory.getLogger(FollowController.class);
     private final FollowService followService;
 
+
     @PostMapping
     public ResponseEntity<String> toggleFollow(
             @RequestParam("following") Long following,
@@ -41,6 +44,7 @@ public class FollowController {
                 .body(message + "내가 팔로우한 수: " + followService.followCount(userDetails.getUser()));
     }
 
+
     @GetMapping("/post")
     public ResponseEntity<Page<FollowWithPostResponseDto>> followPostList(
             @AuthenticationPrincipal UserDetailsImpl userDetails
@@ -52,5 +56,10 @@ public class FollowController {
                 .followPostList(userDetails, pageable);
 
         return ResponseEntity.ok(followPostPage);
+    }
+
+    @GetMapping("/topten")
+    public ResponseEntity<List<FollowTopTenResponseDto>> followTopTen() {
+        return ResponseEntity.ok(followService.followTopTen());
     }
 }
