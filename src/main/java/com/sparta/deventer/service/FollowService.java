@@ -1,6 +1,5 @@
 package com.sparta.deventer.service;
 
-import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.dto.FollowUserInfoResponseDto;
 import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.dto.PostResponseDto;
@@ -104,8 +103,8 @@ public class FollowService {
         );
     }
 
-    public List<FollowTopTenResponseDto> followTopTen() {
-        List<FollowTopTenResponseDto> follows = followRepository.findAllGroupBy();
-        return follows;
-    }
+//    public List<FollowTopTenResponseDto> followTopTen() {
+//        List<FollowTopTenResponseDto> follows = followRepository.findAllGroupBy();
+//        return follows;
+//    }
 }

@@ -1,10 +1,8 @@
 package com.sparta.deventer.controller;
 
-import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.dto.FollowWithPostResponseDto;
 import com.sparta.deventer.security.UserDetailsImpl;
 import com.sparta.deventer.service.FollowService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +56,8 @@ public class FollowController {
         return ResponseEntity.ok(followPostPage);
     }
 
-    @GetMapping("/topten")
-    public ResponseEntity<List<FollowTopTenResponseDto>> followTopTen() {
-        return ResponseEntity.ok(followService.followTopTen());
-    }
+//    @GetMapping("/topten")
+//    public ResponseEntity<List<FollowTopTenResponseDto>> followTopTen() {
+//        return ResponseEntity.ok(followService.followTopTen());
+//    }
 }

@@ -1,6 +1,5 @@
 package com.sparta.deventer.custom;
 
-import com.sparta.deventer.dto.FollowTopTenResponseDto;
 import com.sparta.deventer.entity.Follow;
 import com.sparta.deventer.entity.User;
 import java.util.List;
@@ -20,5 +19,5 @@ public interface FollowRepositoryCustom {
 //                    + "order by 1 desc "
 //
 //    )
-    List<FollowTopTenResponseDto> findAllGroupBy();
+//    List<FollowTopTenResponseDto> findAllGroupBy();
 }
